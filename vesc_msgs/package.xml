@@ -6,13 +6,14 @@
     ROS message definitions for the Vedder VESC open source motor controller.
   </description>
 
-  <maintainer email="boulet@ll.mit.edu">Michael T. Boulet</maintainer>
+  <maintainer email="joebetz@seas.upenn.edu">Johannes Betz</maintainer>
   <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <author email="josh.whitley@autoware.org">Joshua Whitley</author>
   <license>BSD</license>
 
   <url type="website">http://ros.org/wiki/vesc_msgs</url>
-  <url type="repository">https://github.mit.edu/racecar/vesc</url>
-  <url type="bugtracker">https://github.mit.edu/racecar/vesc/issues</url>
+  <url type="repository">https://github.com/f1tenth/vesc</url>
+  <url type="bugtracker">https://github.com/f1tenth/vesc/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
