@@ -1,19 +1,19 @@
 // Copyright 2020 F1TENTH Foundation
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of conditions
 //    and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be used
 //    to endorse or promote products derived from this software without specific prior
 //    written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 // FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -36,16 +36,13 @@ namespace vesc_ackermann
 class AckermannToVescNodelet: public nodelet::Nodelet
 {
 public:
-
   AckermannToVescNodelet() {}
 
 private:
-
   virtual void onInit(void);
 
   boost::shared_ptr<AckermannToVesc> ackermann_to_vesc_;
-
-}; // class AckermannToVescNodelet
+};  // class AckermannToVescNodelet
 
 void AckermannToVescNodelet::onInit()
 {
@@ -53,6 +50,6 @@ void AckermannToVescNodelet::onInit()
   ackermann_to_vesc_.reset(new AckermannToVesc(getNodeHandle(), getPrivateNodeHandle()));
 }
 
-} // namespace vesc_ackermann
+}  // namespace vesc_ackermann
 
 PLUGINLIB_EXPORT_CLASS(vesc_ackermann::AckermannToVescNodelet, nodelet::Nodelet);
