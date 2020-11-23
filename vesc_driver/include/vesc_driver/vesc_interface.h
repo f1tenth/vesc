@@ -1,19 +1,19 @@
 // Copyright 2020 F1TENTH Foundation
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of conditions
 //    and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be used
 //    to endorse or promote products derived from this software without specific prior
 //    written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 // FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -49,7 +49,6 @@ namespace vesc_driver
 class VescInterface : private boost::noncopyable
 {
 public:
-
   typedef boost::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
   typedef boost::function<void (const std::string&)> ErrorHandlerFunction;
 
@@ -130,18 +129,20 @@ class SerialException : public std::exception
   SerialException& operator=(const SerialException&);
   std::string e_what_;
 public:
-  SerialException (const char *description) {
-      std::stringstream ss;
-      ss << "SerialException " << description << " failed.";
-      e_what_ = ss.str();
+  explicit SerialException(const char *description)
+  {
+    std::stringstream ss;
+    ss << "SerialException " << description << " failed.";
+    e_what_ = ss.str();
   }
-  SerialException (const SerialException& other) : e_what_(other.e_what_) {}
+  SerialException(const SerialException& other) : e_what_(other.e_what_) {}
   virtual ~SerialException() throw() {}
-  virtual const char* what () const throw () {
+  virtual const char* what() const throw()
+  {
     return e_what_.c_str();
   }
 };
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_INTERFACE_H_
+#endif  // VESC_DRIVER_VESC_INTERFACE_H_

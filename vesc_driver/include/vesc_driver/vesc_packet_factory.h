@@ -1,19 +1,19 @@
 // Copyright 2020 F1TENTH Foundation
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of conditions
 //    and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be used
 //    to endorse or promote products derived from this software without specific prior
 //    written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 // FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -81,27 +81,29 @@ public:
   static void registerPacketType(int payload_id, CreateFn fn);
 
 private:
-
   typedef std::map<int, CreateFn > FactoryMap;
   static FactoryMap* getMap();
 };
 
+template<typename PACKETTYPE>
+class PacketFactoryTemplate
+{
+public:
+  explicit PacketFactoryTemplate(int payload_id)
+  {
+    VescPacketFactory::registerPacketType(payload_id, &PacketFactoryTemplate::create);
+  }
+
+  static VescPacketPtr create(boost::shared_ptr<VescFrame> frame)
+  {
+    return VescPacketPtr(new PACKETTYPE(frame));
+  }
+};
+
 /** Use this macro to register packets */
-#define REGISTER_PACKET_TYPE(id, klass)   \
-class klass##Factory \
-{ \
-public: \
-  klass##Factory() \
-  { \
-    VescPacketFactory::registerPacketType((id), &klass##Factory::create); \
-  } \
-  static VescPacketPtr create(boost::shared_ptr<VescFrame> frame) \
-  { \
-    return VescPacketPtr(new klass(frame)); \
-  } \
-}; \
-static klass##Factory global_##klass##Factory;
+#define REGISTER_PACKET_TYPE(id, klass) \
+static PacketFactoryTemplate<klass> global_##klass##Factory((id));
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_H_

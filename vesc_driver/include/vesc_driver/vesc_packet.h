@@ -1,19 +1,19 @@
 // Copyright 2020 F1TENTH Foundation
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are permitted
 // provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of conditions
 //    and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other materials
 //    provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be used
 //    to endorse or promote products derived from this software without specific prior
 //    written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
 // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 // FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
@@ -51,25 +51,28 @@ public:
   virtual ~VescFrame() {}
 
   // getters
-  virtual const Buffer& frame() const {return *frame_;}
+  virtual const Buffer& frame() const
+  {
+    return *frame_;
+  }
 
   // VESC packet properties
-  static const int VESC_MAX_PAYLOAD_SIZE = 1024;          ///< Maximum VESC payload size, in bytes
-  static const int VESC_MIN_FRAME_SIZE = 5;               ///< Smallest VESC frame size, in bytes
-  static const int VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE; ///< Largest VESC frame size, in bytes
-  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2; ///< VESC start of "small" frame value
-  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3; ///< VESC start of "large" frame value
-  static const unsigned int VESC_EOF_VAL = 3;             ///< VESC end-of-frame value
+  static const int VESC_MAX_PAYLOAD_SIZE = 1024;           ///< Maximum VESC payload size, in bytes
+  static const int VESC_MIN_FRAME_SIZE = 5;                ///< Smallest VESC frame size, in bytes
+  static const int VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  ///< Largest VESC frame size, in bytes
+  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2;  ///< VESC start of "small" frame value
+  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3;  ///< VESC start of "large" frame value
+  static const unsigned int VESC_EOF_VAL = 3;              ///< VESC end-of-frame value
 
   /** CRC parameters for the VESC */
   typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
 
 protected:
   /** Construct frame with specified payload size. */
-  VescFrame(int payload_size);
+  explicit VescFrame(int payload_size);
 
-  boost::shared_ptr<Buffer> frame_; ///< Stores frame data, shared_ptr for shallow copy
-  BufferRange payload_;             ///< View into frame's payload section
+  boost::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
+  BufferRange payload_;              ///< View into frame's payload section
 
 private:
   /** Construct from buffer. Used by VescPacketFactory factory. */
@@ -87,7 +90,10 @@ class VescPacket : public VescFrame
 public:
   virtual ~VescPacket() {}
 
-  virtual const std::string& name() const {return name_;}
+  virtual const std::string& name() const
+  {
+    return name_;
+  }
 
 protected:
   VescPacket(const std::string& name, int payload_size, int payload_id);
@@ -105,18 +111,16 @@ typedef boost::shared_ptr<VescPacket const> VescPacketConstPtr;
 class VescPacketFWVersion : public VescPacket
 {
 public:
-  VescPacketFWVersion(boost::shared_ptr<VescFrame> raw);
+  explicit VescPacketFWVersion(boost::shared_ptr<VescFrame> raw);
 
   int fwMajor() const;
   int fwMinor() const;
-
 };
 
 class VescPacketRequestFWVersion : public VescPacket
 {
 public:
   VescPacketRequestFWVersion();
-
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -124,7 +128,7 @@ public:
 class VescPacketValues : public VescPacket
 {
 public:
-  VescPacketValues(boost::shared_ptr<VescFrame> raw);
+  explicit VescPacketValues(boost::shared_ptr<VescFrame> raw);
 
   double v_in() const;
   double temp_mos1() const;
@@ -145,7 +149,6 @@ public:
   double tachometer() const;
   double tachometer_abs() const;
   int fault_code() const;
-
 };
 
 class VescPacketRequestValues : public VescPacket
@@ -159,7 +162,7 @@ public:
 class VescPacketSetDuty : public VescPacket
 {
 public:
-  VescPacketSetDuty(double duty);
+  explicit VescPacketSetDuty(double duty);
 
   //  double duty() const;
 };
@@ -169,7 +172,7 @@ public:
 class VescPacketSetCurrent : public VescPacket
 {
 public:
-  VescPacketSetCurrent(double current);
+  explicit VescPacketSetCurrent(double current);
 
   //  double current() const;
 };
@@ -179,7 +182,7 @@ public:
 class VescPacketSetCurrentBrake : public VescPacket
 {
 public:
-  VescPacketSetCurrentBrake(double current_brake);
+  explicit VescPacketSetCurrentBrake(double current_brake);
 
   //  double current_brake() const;
 };
@@ -189,7 +192,7 @@ public:
 class VescPacketSetRPM : public VescPacket
 {
 public:
-  VescPacketSetRPM(double rpm);
+  explicit VescPacketSetRPM(double rpm);
 
   //  double rpm() const;
 };
@@ -199,7 +202,7 @@ public:
 class VescPacketSetPos : public VescPacket
 {
 public:
-  VescPacketSetPos(double pos);
+  explicit VescPacketSetPos(double pos);
 
   //  double pos() const;
 };
@@ -209,11 +212,11 @@ public:
 class VescPacketSetServoPos : public VescPacket
 {
 public:
-  VescPacketSetServoPos(double servo_pos);
+  explicit VescPacketSetServoPos(double servo_pos);
 
   //  double servo_pos() const;
 };
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_PACKET_H_
+#endif  // VESC_DRIVER_VESC_PACKET_H_

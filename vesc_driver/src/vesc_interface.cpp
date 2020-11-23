@@ -1,13 +1,39 @@
+// Copyright 2020 F1TENTH Foundation
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this list of conditions
+//    and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice, this list
+//    of conditions and the following disclaimer in the documentation and/or other materials
+//    provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its contributors may be used
+//    to endorse or promote products derived from this software without specific prior
+//    written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+// WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 // -*- mode:c++; fill-column: 100; -*-
 
 #include "vesc_driver/vesc_interface.h"
 
 #include <pthread.h>
 
-#include <string>
-#include <sstream>
-#include <iostream>
+#include <algorithm>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include <serial/serial.h>
 #include <boost/crc.hpp>
@@ -45,27 +71,29 @@ void* VescInterface::Impl::rxThread(void)
   Buffer buffer;
   buffer.reserve(4096);
 
-  while (rx_thread_run_) {
-
+  while (rx_thread_run_)
+  {
     int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
-    if (!buffer.empty()) {
-
+    if (!buffer.empty())
+    {
       // search buffer for valid packet(s)
       Buffer::iterator iter(buffer.begin());
       Buffer::iterator iter_begin(buffer.begin());
-      while (iter != buffer.end()) {
-
+      while (iter != buffer.end())
+      {
         // check if valid start-of-frame character
         if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *iter ||
-            VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter) {
-
+            VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter)
+        {
           // good start, now attempt to create packet
           std::string error;
           VescPacketConstPtr packet =
             VescPacketFactory::createPacket(iter, buffer.end(), &bytes_needed, &error);
-          if (packet) {
+          if (packet)
+          {
             // good packet, check if we skipped any data
-            if (std::distance(iter_begin, iter) > 0) {
+            if (std::distance(iter_begin, iter) > 0)
+            {
               std::ostringstream ss;
               ss << "Out-of-sync with VESC, unknown data leading valid frame. Discarding "
                  << std::distance(iter_begin, iter) << " bytes.";
@@ -79,11 +107,13 @@ void* VescInterface::Impl::rxThread(void)
             // continue to look for another frame in buffer
             continue;
           }
-          else if (bytes_needed > 0) {
+          else if (bytes_needed > 0)
+          {
             // need more data, break out of while loop
-            break; // for (iter_sof...
+            break;  // for (iter_sof...
           }
-          else {
+          else
+          {
             // else, this was not a packet, move on to next byte
             error_handler_(error);
           }
@@ -97,7 +127,8 @@ void* VescInterface::Impl::rxThread(void)
         bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
 
       // erase "used" buffer
-      if (std::distance(iter_begin, iter) > 0) {
+      if (std::distance(iter_begin, iter) > 0)
+      {
         std::ostringstream ss;
         ss << "Out-of-sync with VESC, discarding " << std::distance(iter_begin, iter) << " bytes.";
         error_handler_(ss.str());
@@ -109,10 +140,10 @@ void* VescInterface::Impl::rxThread(void)
     int bytes_to_read =
       std::max(bytes_needed, std::min(4096, static_cast<int>(serial_.available())));
     int bytes_read = serial_.read(buffer, bytes_to_read);
-    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
+    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
+    {
       error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
     }
-
   }
 }
 
@@ -150,19 +181,22 @@ void VescInterface::connect(const std::string& port)
 {
   // todo - mutex?
 
-  if (isConnected()) {
+  if (isConnected())
+  {
     throw SerialException("Already connected to serial port.");
   }
 
   // connect to serial port
-  try {
+  try
+  {
     impl_->serial_.setPort(port);
     impl_->serial_.open();
   }
-  catch (const std::exception& e) {
-      std::stringstream ss;
-      ss << "Failed to open the serial port to the VESC. " << e.what();
-      throw SerialException(ss.str().c_str());
+  catch (const std::exception& e)
+  {
+    std::stringstream ss;
+    ss << "Failed to open the serial port to the VESC. " << e.what();
+    throw SerialException(ss.str().c_str());
   }
 
   // start up a monitoring thread
@@ -176,7 +210,8 @@ void VescInterface::disconnect()
 {
   // todo - mutex?
 
-  if (isConnected()) {
+  if (isConnected())
+  {
     // bring down read thread
     impl_->rx_thread_run_ = false;
     int result = pthread_join(impl_->rx_thread_, NULL);
@@ -194,7 +229,8 @@ bool VescInterface::isConnected() const
 void VescInterface::send(const VescPacket& packet)
 {
   size_t written = impl_->serial_.write(packet.frame());
-  if (written != packet.frame().size()) {
+  if (written != packet.frame().size())
+  {
     std::stringstream ss;
     ss << "Wrote " << written << " bytes, expected " << packet.frame().size() << ".";
     throw SerialException(ss.str().c_str());
@@ -241,4 +277,4 @@ void VescInterface::setServo(double servo)
   send(VescPacketSetServoPos(servo));
 }
 
-} // namespace vesc_driver
+}  // namespace vesc_driver

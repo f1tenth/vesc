@@ -30,8 +30,8 @@
 
 // Load definitions of standard types.
 
-#ifndef V8STDINT_H_
-#define V8STDINT_H_
+#ifndef VESC_DRIVER_V8STDINT_H
+#define VESC_DRIVER_V8STDINT_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -54,4 +54,4 @@ typedef unsigned __int64 uint64_t;
 
 #endif
 
-#endif  // V8STDINT_H_
+#endif  // VESC_DRIVER_V8STDINT_H
