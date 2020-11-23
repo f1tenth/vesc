@@ -1,0 +1,41 @@
+name: ROS1 CI Workflow
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build-ros1:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    container:
+      image: ros:kinetic
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Create Workspace
+        run: |
+          mkdir -p src_tmp/vesc; \
+          mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/vesc/; \
+          mv src_tmp/ src/; \
+          cd src; \
+          bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
+          catkin_init_workspace'
+      - name: Install Dependencies
+        run: |
+          bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
+          apt-get update && rosdep update; \
+          rosdep install --from-paths src --ignore-src -y'
+      - name: Build Workspace
+        run: |
+          bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
+          catkin_make'
+      - name: Run Tests
+        run: |
+          bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
+          catkin_make run_tests; \
+          catkin_test_results --verbose'
