@@ -1,18 +1,25 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vesc_driver)
 
+find_package(Boost REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
   nodelet
   pluginlib
   roscpp
+  roslint
+  serial
   std_msgs
   vesc_msgs
-  serial
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS nodelet pluginlib roscpp std_msgs vesc_msgs serial
+  CATKIN_DEPENDS
+    nodelet
+    pluginlib
+    std_msgs
+    vesc_msgs serial
 )
 
 ###########
@@ -47,6 +54,8 @@ target_link_libraries(vesc_driver_nodelet
   ${catkin_LIBRARIES}
 )
 
+roslint_cpp()
+
 #############
 ## Install ##
 #############
@@ -70,4 +79,6 @@ install(DIRECTORY launch/
 ## Testing ##
 #############
 
-# TODO
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+endif()

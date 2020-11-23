@@ -1,29 +1,31 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vesc_ackermann)
 
+find_package(Boost REQUIRED)
+
 find_package(catkin REQUIRED COMPONENTS
+  ackermann_msgs
+  geometry_msgs
+  nav_msgs
   nodelet
   pluginlib
   roscpp
-  nav_msgs
+  roslint
   std_msgs
-  geometry_msgs
   tf
-  ackermann_msgs
   vesc_msgs
 )
 
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
+    ackermann_msgs
+    geometry_msgs
+    nav_msgs
     nodelet
     pluginlib
-    roscpp
-    nav_msgs
     std_msgs
-    geometry_msgs
     tf
-    ackermann_msgs
     vesc_msgs
 )
 
@@ -62,6 +64,8 @@ target_link_libraries(vesc_ackermann_nodelet
   ${catkin_LIBRARIES}
 )
 
+roslint_cpp()
+
 #############
 ## Install ##
 #############
@@ -85,4 +89,6 @@ install(DIRECTORY launch/
 ## Testing ##
 #############
 
-# TODO
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+endif()
