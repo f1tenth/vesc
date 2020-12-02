@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>vesc</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>
     Metapackage for ROS interface to the Vedder VESC open source motor controller.
   </description>

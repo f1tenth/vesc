@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>vesc_driver</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>
     ROS device driver for the Vedder VESC open source motor driver.
   </description>

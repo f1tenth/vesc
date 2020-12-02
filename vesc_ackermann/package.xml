@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>vesc_ackermann</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>
     Translate between VESC messages and ROS ackermann and odometry messages.
   </description>

@@ -2,8 +2,8 @@
 Changelog for package vesc_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2020-12-02)
+------------------
 * Applying roslint and replacing registration macro with templated class.
 * Adding roslint.
 * Adding licenses.
