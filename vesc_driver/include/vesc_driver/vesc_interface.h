@@ -35,8 +35,6 @@
 #include <stdexcept>
 #include <string>
 
-#include <boost/noncopyable.hpp>
-
 #include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
@@ -45,7 +43,7 @@ namespace vesc_driver
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface : private boost::noncopyable
+class VescInterface
 {
 public:
   typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
@@ -65,6 +63,12 @@ public:
   VescInterface(const std::string& port = std::string(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
+
+  /**
+   * Delete copy constructor and equals operator.
+   */
+  VescInterface(const VescInterface &) = delete;
+  VescInterface & operator=(const VescInterface &) = delete;
 
   /**
    * VescInterface destructor.

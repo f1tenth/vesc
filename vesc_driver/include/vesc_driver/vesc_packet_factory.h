@@ -35,8 +35,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/noncopyable.hpp>
-
 #include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
@@ -45,7 +43,7 @@ namespace vesc_driver
 /**
  * Class for creating VESC packets from raw data.
  */
-class VescPacketFactory : private boost::noncopyable
+class VescPacketFactory
 {
 public:
   /** Return the global factory object */
@@ -80,7 +78,14 @@ public:
   /** Register a packet type with the factory. */
   static void registerPacketType(int payload_id, CreateFn fn);
 
+  /**
+   * Delete copy constructor and equals operator.
+   */
+  VescPacketFactory(const VescPacketFactory &) = delete;
+  VescPacketFactory & operator=(const VescPacketFactory &) = delete;
+
 private:
+  VescPacketFactory();
   typedef std::map<int, CreateFn > FactoryMap;
   static FactoryMap* getMap();
 };
