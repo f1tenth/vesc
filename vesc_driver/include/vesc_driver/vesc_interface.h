@@ -29,12 +29,12 @@
 #define VESC_DRIVER_VESC_INTERFACE_H_
 
 #include <exception>
+#include <functional>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "vesc_driver/vesc_packet.h"
@@ -48,8 +48,8 @@ namespace vesc_driver
 class VescInterface : private boost::noncopyable
 {
 public:
-  typedef boost::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef boost::function<void (const std::string&)> ErrorHandlerFunction;
+  typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
+  typedef std::function<void (const std::string&)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not

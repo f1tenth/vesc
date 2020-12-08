@@ -30,6 +30,7 @@
 #include <pthread.h>
 
 #include <algorithm>
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
