@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vesc_driver)
 
+# Set minimum C++ standard to C++11
+if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+
 find_package(Boost REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -54,6 +63,7 @@ target_link_libraries(vesc_driver_nodelet
   ${catkin_LIBRARIES}
 )
 
+set(ROSLINT_CPP_OPTS "--filter=-build/c++11")
 roslint_cpp()
 
 #############
