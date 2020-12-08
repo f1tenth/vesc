@@ -29,12 +29,12 @@
 #define VESC_DRIVER_VESC_PACKET_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 #include <utility>
 
 #include <boost/crc.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace vesc_driver
 {
@@ -70,7 +70,7 @@ protected:
   /** Construct frame with specified payload size. */
   explicit VescFrame(int payload_size);
 
-  boost::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
+  std::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
   BufferRange payload_;              ///< View into frame's payload section
 
 private:
@@ -96,21 +96,21 @@ public:
 
 protected:
   VescPacket(const std::string& name, int payload_size, int payload_id);
-  VescPacket(const std::string& name, boost::shared_ptr<VescFrame> raw);
+  VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
 
 private:
   std::string name_;
 };
 
-typedef boost::shared_ptr<VescPacket> VescPacketPtr;
-typedef boost::shared_ptr<VescPacket const> VescPacketConstPtr;
+typedef std::shared_ptr<VescPacket> VescPacketPtr;
+typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
 
 /*------------------------------------------------------------------------------------------------*/
 
 class VescPacketFWVersion : public VescPacket
 {
 public:
-  explicit VescPacketFWVersion(boost::shared_ptr<VescFrame> raw);
+  explicit VescPacketFWVersion(std::shared_ptr<VescFrame> raw);
 
   int fwMajor() const;
   int fwMinor() const;
@@ -127,7 +127,7 @@ public:
 class VescPacketValues : public VescPacket
 {
 public:
-  explicit VescPacketValues(boost::shared_ptr<VescFrame> raw);
+  explicit VescPacketValues(std::shared_ptr<VescFrame> raw);
 
   double v_in() const;
   double temp_mos1() const;

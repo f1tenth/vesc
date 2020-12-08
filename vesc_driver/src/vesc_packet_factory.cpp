@@ -29,6 +29,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <memory>
 #include <string>
 
 #include <boost/range/begin.hpp>
@@ -125,7 +126,7 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
     return createFailed(num_bytes_needed, what, "Invalid checksum");
 
   // frame looks good, construct the raw frame
-  boost::shared_ptr<VescFrame> raw_frame(new VescFrame(view_frame, view_payload));
+  std::shared_ptr<VescFrame> raw_frame(new VescFrame(view_frame, view_payload));
 
   // if the packet has a payload, construct the corresponding subclass
   if (boost::distance(view_payload) > 0)

@@ -29,6 +29,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <memory>
 #include <string>
 
 #include <boost/range/begin.hpp>
@@ -90,14 +91,14 @@ VescPacket::VescPacket(const std::string& name, int payload_size, int payload_id
   *payload_.first = payload_id;
 }
 
-VescPacket::VescPacket(const std::string& name, boost::shared_ptr<VescFrame> raw) :
+VescPacket::VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw) :
   VescFrame(*raw), name_(name)
 {
 }
 
 /*------------------------------------------------------------------------------------------------*/
 
-VescPacketFWVersion::VescPacketFWVersion(boost::shared_ptr<VescFrame> raw) :
+VescPacketFWVersion::VescPacketFWVersion(std::shared_ptr<VescFrame> raw) :
   VescPacket("FWVersion", raw)
 {
 }
@@ -126,7 +127,7 @@ VescPacketRequestFWVersion::VescPacketRequestFWVersion() :
 
 /*------------------------------------------------------------------------------------------------*/
 
-VescPacketValues::VescPacketValues(boost::shared_ptr<VescFrame> raw) :
+VescPacketValues::VescPacketValues(std::shared_ptr<VescFrame> raw) :
   VescPacket("Values", raw)
 {
 }

@@ -28,15 +28,14 @@
 #ifndef VESC_DRIVER_VESC_INTERFACE_H_
 #define VESC_DRIVER_VESC_INTERFACE_H_
 
-#include <string>
-#include <sstream>
 #include <exception>
+#include <memory>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -119,7 +118,7 @@ public:
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
-  boost::scoped_ptr<Impl> impl_;
+  std::unique_ptr<Impl> impl_;
 };
 
 // todo: review

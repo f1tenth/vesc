@@ -30,12 +30,12 @@
 
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -75,7 +75,7 @@ public:
                                     const Buffer::const_iterator& end,
                                     int* num_bytes_needed, std::string* what);
 
-  typedef boost::function<VescPacketPtr(boost::shared_ptr<VescFrame>)> CreateFn;
+  typedef boost::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
   /** Register a packet type with the factory. */
   static void registerPacketType(int payload_id, CreateFn fn);
@@ -94,7 +94,7 @@ public:
     VescPacketFactory::registerPacketType(payload_id, &PacketFactoryTemplate::create);
   }
 
-  static VescPacketPtr create(boost::shared_ptr<VescFrame> frame)
+  static VescPacketPtr create(std::shared_ptr<VescFrame> frame)
   {
     return VescPacketPtr(new PACKETTYPE(frame));
   }
