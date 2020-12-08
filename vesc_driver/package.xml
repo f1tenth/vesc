@@ -14,17 +14,18 @@
   <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
   <author email="josh.whitley@autoware.org">Joshua Whitley</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roslint</build_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>nodelet</depend>
-  <depend>pluginlib</depend>
-  <depend>roscpp</depend>
-  <depend>serial</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>serial_driver</depend>
   <depend>std_msgs</depend>
   <depend>vesc_msgs</depend>
 
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
   <export>
-    <nodelet plugin="${prefix}/vesc_driver_nodelet.xml"/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
