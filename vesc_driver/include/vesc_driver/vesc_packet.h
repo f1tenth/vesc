@@ -34,7 +34,8 @@
 #include <vector>
 #include <utility>
 
-#include <boost/crc.hpp>
+#define CRCPP_USE_CPP11
+#include "vesc_driver/crc.h"
 
 namespace vesc_driver
 {
@@ -64,7 +65,7 @@ public:
   static const unsigned int VESC_EOF_VAL = 3;              ///< VESC end-of-frame value
 
   /** CRC parameters for the VESC */
-  typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
+  static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_TYPE = { 0x1021, 0x0000, 0x0000, false, false };
 
 protected:
   /** Construct frame with specified payload size. */

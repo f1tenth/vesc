@@ -116,9 +116,8 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
 
   // is the crc valid?
   uint16_t crc = (static_cast<uint16_t>(*iter_crc) << 8) + *(iter_crc + 1);
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*view_payload.first), std::distance(view_payload.first, view_payload.second));
-  if (crc != crc_calc.checksum())
+  if (crc != CRC::Calculate(
+    &(*view_payload.first), std::distance(view_payload.first, view_payload.second), VescFrame::CRC_TYPE))
     return createFailed(num_bytes_needed, what, "Invalid checksum");
 
   // frame looks good, construct the raw frame
