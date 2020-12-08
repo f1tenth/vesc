@@ -28,15 +28,15 @@
 #ifndef VESC_DRIVER_VESC_PACKET_FACTORY_H_
 #define VESC_DRIVER_VESC_PACKET_FACTORY_H_
 
-#include <vector>
+#include <cstdint>
 #include <map>
 #include <string>
+#include <vector>
 
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "vesc_driver/v8stdint.h"
 #include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver

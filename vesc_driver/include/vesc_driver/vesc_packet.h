@@ -28,14 +28,13 @@
 #ifndef VESC_DRIVER_VESC_PACKET_H_
 #define VESC_DRIVER_VESC_PACKET_H_
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <utility>
 
 #include <boost/crc.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include "vesc_driver/v8stdint.h"
 
 namespace vesc_driver
 {

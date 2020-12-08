@@ -45,7 +45,7 @@
 #ifndef VESC_DRIVER_DATATYPES_H
 #define VESC_DRIVER_DATATYPES_H
 
-#include <stdint.h>
+#include <cstdint>
 
 typedef struct
 {
