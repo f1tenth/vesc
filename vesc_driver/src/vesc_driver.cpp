@@ -33,17 +33,18 @@
 #include <sstream>
 #include <string>
 
-#include <boost/bind.hpp>
 #include <vesc_msgs/VescStateStamped.h>
 
 namespace vesc_driver
 {
 
+using std::placeholders::_1;
+
 VescDriver::VescDriver(ros::NodeHandle nh,
                        ros::NodeHandle private_nh) :
   vesc_(std::string(),
-        boost::bind(&VescDriver::vescPacketCallback, this, _1),
-        boost::bind(&VescDriver::vescErrorCallback, this, _1)),
+        std::bind(&VescDriver::vescPacketCallback, this, _1),
+        std::bind(&VescDriver::vescErrorCallback, this, _1)),
   duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0), current_limit_(private_nh, "current"),
   brake_limit_(private_nh, "brake"), speed_limit_(private_nh, "speed"),
   position_limit_(private_nh, "position"), servo_limit_(private_nh, "servo", 0.0, 1.0),
