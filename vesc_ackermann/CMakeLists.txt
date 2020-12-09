@@ -10,8 +10,6 @@ elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-find_package(Boost REQUIRED)
-
 find_package(catkin REQUIRED COMPONENTS
   ackermann_msgs
   geometry_msgs
@@ -44,7 +42,6 @@ catkin_package(
 
 include_directories(
   include
-  ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
