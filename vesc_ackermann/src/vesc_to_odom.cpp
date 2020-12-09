@@ -37,7 +37,7 @@ namespace vesc_ackermann
 {
 
 template <typename T>
-inline bool getRequiredParam(const ros::NodeHandle& nh, std::string name, T& value);
+inline bool getRequiredParam(const ros::NodeHandle& nh, const std::string& name, T* value);
 
 VescToOdom::VescToOdom(ros::NodeHandle nh, ros::NodeHandle private_nh) :
   odom_frame_("odom"), base_frame_("base_link"),
@@ -47,17 +47,17 @@ VescToOdom::VescToOdom(ros::NodeHandle nh, ros::NodeHandle private_nh) :
   private_nh.param("odom_frame", odom_frame_, odom_frame_);
   private_nh.param("base_frame", base_frame_, base_frame_);
   private_nh.param("use_servo_cmd_to_calc_angular_velocity", use_servo_cmd_, use_servo_cmd_);
-  if (!getRequiredParam(nh, "speed_to_erpm_gain", speed_to_erpm_gain_))
+  if (!getRequiredParam(nh, "speed_to_erpm_gain", &speed_to_erpm_gain_))
     return;
-  if (!getRequiredParam(nh, "speed_to_erpm_offset", speed_to_erpm_offset_))
+  if (!getRequiredParam(nh, "speed_to_erpm_offset", &speed_to_erpm_offset_))
     return;
   if (use_servo_cmd_)
   {
-    if (!getRequiredParam(nh, "steering_angle_to_servo_gain", steering_to_servo_gain_))
+    if (!getRequiredParam(nh, "steering_angle_to_servo_gain", &steering_to_servo_gain_))
       return;
-    if (!getRequiredParam(nh, "steering_angle_to_servo_offset", steering_to_servo_offset_))
+    if (!getRequiredParam(nh, "steering_angle_to_servo_offset", &steering_to_servo_offset_))
       return;
-    if (!getRequiredParam(nh, "wheelbase", wheelbase_))
+    if (!getRequiredParam(nh, "wheelbase", &wheelbase_))
       return;
   }
   private_nh.param("publish_tf", publish_tf_, publish_tf_);
@@ -176,9 +176,9 @@ void VescToOdom::servoCmdCallback(const std_msgs::Float64::ConstPtr& servo)
 }
 
 template <typename T>
-inline bool getRequiredParam(const ros::NodeHandle& nh, std::string name, T& value)
+inline bool getRequiredParam(const ros::NodeHandle& nh, const std::string& name, T* value)
 {
-  if (nh.getParam(name, value))
+  if (nh.getParam(name, *value))
     return true;
 
   ROS_FATAL("VescToOdom: Parameter %s is required.", name.c_str());
