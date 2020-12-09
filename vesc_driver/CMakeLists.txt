@@ -63,8 +63,14 @@ target_link_libraries(vesc_driver_nodelet
   ${catkin_LIBRARIES}
 )
 
+file(GLOB_RECURSE ${PROJECT_NAME}_CPP_FILES
+  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  . *.cpp *.h)
+list(REMOVE_ITEM ${PROJECT_NAME}_CPP_FILES
+  include/${PROJECT_NAME}/crc.h)
+
 set(ROSLINT_CPP_OPTS "--filter=-build/c++11")
-roslint_cpp()
+roslint_cpp(${${PROJECT_NAME}_CPP_FILES})
 
 #############
 ## Install ##
