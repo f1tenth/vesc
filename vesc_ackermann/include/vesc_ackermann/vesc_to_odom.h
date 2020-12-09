@@ -28,12 +28,12 @@
 #ifndef VESC_ACKERMANN_VESC_TO_ODOM_H_
 #define VESC_ACKERMANN_VESC_TO_ODOM_H_
 
+#include <memory>
 #include <string>
 
 #include <ros/ros.h>
 #include <vesc_msgs/VescStateStamped.h>
 #include <std_msgs/Float64.h>
-#include <boost/shared_ptr.hpp>
 #include <tf/transform_broadcaster.h>
 
 namespace vesc_ackermann
@@ -65,7 +65,7 @@ private:
   ros::Publisher odom_pub_;
   ros::Subscriber vesc_state_sub_;
   ros::Subscriber servo_sub_;
-  boost::shared_ptr<tf::TransformBroadcaster> tf_pub_;
+  std::shared_ptr<tf::TransformBroadcaster> tf_pub_;
 
   // ROS callbacks
   void vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& state);
