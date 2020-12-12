@@ -25,7 +25,8 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_interface.h"
+#include "vesc_driver/vesc_interface.hpp"
+#include "vesc_driver/vesc_packet_factory.hpp"
 
 #include <pthread.h>
 
@@ -35,10 +36,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include <serial/serial.h>
-
-#include "vesc_driver/vesc_packet_factory.h"
 
 namespace vesc_driver
 {

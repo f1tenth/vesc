@@ -25,7 +25,7 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_driver.h"
+#include "vesc_driver/vesc_driver.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -33,7 +33,7 @@
 #include <sstream>
 #include <string>
 
-#include <vesc_msgs/VescStateStamped.h>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 namespace vesc_driver
 {

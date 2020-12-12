@@ -25,21 +25,23 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#ifndef VESC_DRIVER_VESC_DRIVER_H_
-#define VESC_DRIVER_VESC_DRIVER_H_
+#ifndef VESC_DRIVER__VESC_DRIVER_HPP_
+#define VESC_DRIVER__VESC_DRIVER_HPP_
+
+#include "vesc_driver/vesc_interface.hpp"
+#include "vesc_driver/vesc_packet.hpp"
 
 #include <memory>
 #include <string>
 
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <boost/optional.hpp>
-
-#include "vesc_driver/vesc_interface.h"
-#include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
 {
+
+using std_msgs::msg::Float64;
 
 class VescDriver
 {
@@ -96,15 +98,15 @@ private:
   int fw_version_minor_;                ///< firmware minor version reported by vesc
 
   // ROS callbacks
-  void timerCallback(const ros::TimerEvent& event);
-  void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
-  void currentCallback(const std_msgs::Float64::ConstPtr& current);
-  void brakeCallback(const std_msgs::Float64::ConstPtr& brake);
-  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
-  void positionCallback(const std_msgs::Float64::ConstPtr& position);
-  void servoCallback(const std_msgs::Float64::ConstPtr& servo);
+  void timerCallback(const rclcpp::TimerEvent& event);
+  void dutyCycleCallback(const Float64::ConstPtr& duty_cycle);
+  void currentCallback(const Float64::ConstPtr& current);
+  void brakeCallback(const Float64::ConstPtr& brake);
+  void speedCallback(const Float64::ConstPtr& speed);
+  void positionCallback(const Float64::ConstPtr& position);
+  void servoCallback(const Float64::ConstPtr& servo);
 };
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_DRIVER_H_
+#endif  // VESC_DRIVER__VESC_DRIVER_HPP_

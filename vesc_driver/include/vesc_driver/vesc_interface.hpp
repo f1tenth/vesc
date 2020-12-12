@@ -25,8 +25,10 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#ifndef VESC_DRIVER_VESC_INTERFACE_H_
-#define VESC_DRIVER_VESC_INTERFACE_H_
+#ifndef VESC_DRIVER__VESC_INTERFACE_HPP_
+#define VESC_DRIVER__VESC_INTERFACE_HPP_
+
+#include "vesc_driver/vesc_packet.hpp"
 
 #include <exception>
 #include <functional>
@@ -34,8 +36,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
-#include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
 {
@@ -148,4 +148,4 @@ public:
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_INTERFACE_H_
+#endif  // VESC_DRIVER__VESC_INTERFACE_HPP_

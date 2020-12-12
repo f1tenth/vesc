@@ -25,8 +25,10 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#ifndef VESC_DRIVER_VESC_PACKET_FACTORY_H_
-#define VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#ifndef VESC_DRIVER__VESC_PACKET_FACTORY_HPP_
+#define VESC_DRIVER__VESC_PACKET_FACTORY_HPP_
+
+#include "vesc_driver/vesc_packet.hpp"
 
 #include <cstdint>
 #include <functional>
@@ -34,8 +36,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
 {
@@ -111,4 +111,4 @@ static PacketFactoryTemplate<klass> global_##klass##Factory((id));
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif  // VESC_DRIVER__VESC_PACKET_FACTORY_HPP_

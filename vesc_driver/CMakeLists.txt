@@ -18,17 +18,7 @@ ament_auto_find_build_dependencies()
 ###########
 
 # node executable
-ament_auto_add_executable(vesc_driver_node
-  src/vesc_driver_node.cpp
-  src/vesc_driver.cpp
-  src/vesc_interface.cpp
-  src/vesc_packet.cpp
-  src/vesc_packet_factory.cpp
-)
-
-# nodelet library
-ament_auto_add_library(vesc_driver_nodelet
-  src/vesc_driver_nodelet.cpp
+ament_auto_add_library(${PROJECT_NAME}_node SHARED
   src/vesc_driver.cpp
   src/vesc_interface.cpp
   src/vesc_packet.cpp

@@ -25,8 +25,8 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#ifndef VESC_DRIVER_VESC_PACKET_H_
-#define VESC_DRIVER_VESC_PACKET_H_
+#ifndef VESC_DRIVER__VESC_PACKET_HPP_
+#define VESC_DRIVER__VESC_PACKET_HPP_
 
 #include <cstdint>
 #include <memory>
@@ -35,7 +35,7 @@
 #include <utility>
 
 #define CRCPP_USE_CPP11
-#include "vesc_driver/crc.h"
+#include "vesc_driver/crc.hpp"
 
 namespace vesc_driver
 {
@@ -219,4 +219,4 @@ public:
 
 }  // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_PACKET_H_
+#endif  // VESC_DRIVER__VESC_PACKET_HPP_

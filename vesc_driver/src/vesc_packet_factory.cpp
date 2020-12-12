@@ -25,14 +25,13 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_packet_factory.h"
+#include "vesc_driver/vesc_packet.hpp"
+#include "vesc_driver/vesc_packet_factory.hpp"
 
 #include <cassert>
 #include <iterator>
 #include <memory>
 #include <string>
-
-#include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
 {
