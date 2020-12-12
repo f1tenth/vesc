@@ -16,9 +16,10 @@
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
+  <depend>libboost-dev</depend>
+  <depend>libboost-system-dev</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
-  <depend>serial_driver</depend>
   <depend>std_msgs</depend>
   <depend>vesc_msgs</depend>
 

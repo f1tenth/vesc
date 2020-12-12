@@ -36,18 +36,19 @@
 
 #include <boost/optional.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <serial_driver/serial_driver_node.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <vesc_msgs/msg/vesc_state.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 namespace vesc_driver
 {
 
 using std_msgs::msg::Float64;
 using vesc_msgs::msg::VescState;
+using vesc_msgs::msg::VescStateStamped;
 
 class VescDriver
-: public autoware::drivers::serial_driver::SerialDriverNode<VescDriver, VescPacket, VescState>
+: public rclcpp::Node
 {
 public:
   VescDriver(const rclcpp::NodeOptions & options);
@@ -62,10 +63,13 @@ private:
   struct CommandLimit
   {
     CommandLimit(
-      const std::string& str,
+      rclcpp::Node * node_ptr,
+      const std::string & str,
       const boost::optional<double>& min_lower = boost::optional<double>(),
       const boost::optional<double>& max_upper = boost::optional<double>());
     double clip(double value);
+    rclcpp::Node * node_ptr;
+    rclcpp::Logger logger;
     std::string name;
     boost::optional<double> lower;
     boost::optional<double> upper;
@@ -79,8 +83,8 @@ private:
   CommandLimit servo_limit_;
 
   // ROS services
-  rclcpp::PublisherBase::SharedPtr state_pub_;
-  rclcpp::PublisherBase::SharedPtr servo_sensor_pub_;
+  rclcpp::Publisher<VescStateStamped>::SharedPtr state_pub_;
+  rclcpp::Publisher<Float64>::SharedPtr servo_sensor_pub_;
   rclcpp::SubscriptionBase::SharedPtr duty_cycle_sub_;
   rclcpp::SubscriptionBase::SharedPtr current_sub_;
   rclcpp::SubscriptionBase::SharedPtr brake_sub_;
@@ -103,12 +107,12 @@ private:
   int fw_version_minor_;                ///< firmware minor version reported by vesc
 
   // ROS callbacks
-  void brakeCallback(const Float64::SharedPtr & brake);
-  void currentCallback(const Float64::SharedPtr & current);
-  void dutyCycleCallback(const Float64::SharedPtr & duty_cycle);
-  void positionCallback(const Float64::SharedPtr & position);
-  void servoCallback(const Float64::SharedPtr & servo);
-  void speedCallback(const Float64::SharedPtr & speed);
+  void brakeCallback(const Float64::SharedPtr brake);
+  void currentCallback(const Float64::SharedPtr current);
+  void dutyCycleCallback(const Float64::SharedPtr duty_cycle);
+  void positionCallback(const Float64::SharedPtr position);
+  void servoCallback(const Float64::SharedPtr servo);
+  void speedCallback(const Float64::SharedPtr speed);
   void timerCallback();
 };
 
