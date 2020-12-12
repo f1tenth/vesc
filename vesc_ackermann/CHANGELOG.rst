@@ -2,8 +2,8 @@
 Changelog for package vesc_ackermann
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.1.0 (2020-12-12)
+------------------
 * Merge pull request `#1 <https://github.com/f1tenth/vesc/issues/1>`_ from f1tenth/melodic-devel
   Updating for Melodic
 * Remove unused Boost dependency.
