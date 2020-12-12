@@ -29,11 +29,8 @@
 
 #include <cassert>
 #include <iterator>
+#include <memory>
 #include <string>
-
-#include <boost/range/begin.hpp>
-#include <boost/range/distance.hpp>
-#include <boost/range/end.hpp>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -99,7 +96,7 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
   }
 
   // check length
-  if (boost::distance(view_payload) > VescFrame::VESC_MAX_PAYLOAD_SIZE)
+  if (std::distance(view_payload.first, view_payload.second) > VescFrame::VESC_MAX_PAYLOAD_SIZE)
     return createFailed(num_bytes_needed, what, "Invalid payload length");
 
   // get iterators to crc field, end-of-frame field, and a view of the whole frame
@@ -108,7 +105,7 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
   BufferRangeConst view_frame(begin, iter_eof + 1);
 
   // do we have enough data in the buffer to complete the frame?
-  int frame_size = boost::distance(view_frame);
+  int frame_size = std::distance(view_frame.first, view_frame.second);
   if (buffer_size < frame_size)
     return createFailed(num_bytes_needed, what, "Buffer does not contain a complete frame",
                         frame_size - buffer_size);
@@ -119,16 +116,15 @@ VescPacketPtr VescPacketFactory::createPacket(const Buffer::const_iterator& begi
 
   // is the crc valid?
   uint16_t crc = (static_cast<uint16_t>(*iter_crc) << 8) + *(iter_crc + 1);
-  VescFrame::CRC crc_calc;
-  crc_calc.process_bytes(&(*view_payload.first), boost::distance(view_payload));
-  if (crc != crc_calc.checksum())
+  if (crc != CRC::Calculate(
+    &(*view_payload.first), std::distance(view_payload.first, view_payload.second), VescFrame::CRC_TYPE))
     return createFailed(num_bytes_needed, what, "Invalid checksum");
 
   // frame looks good, construct the raw frame
-  boost::shared_ptr<VescFrame> raw_frame(new VescFrame(view_frame, view_payload));
+  std::shared_ptr<VescFrame> raw_frame(new VescFrame(view_frame, view_payload));
 
   // if the packet has a payload, construct the corresponding subclass
-  if (boost::distance(view_payload) > 0)
+  if (std::distance(view_payload.first, view_payload.second) > 0)
   {
     // get constructor function from payload id
     FactoryMap* p_map(getMap());

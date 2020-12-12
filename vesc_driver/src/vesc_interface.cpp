@@ -30,13 +30,13 @@
 #include <pthread.h>
 
 #include <algorithm>
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include <serial/serial.h>
-#include <boost/crc.hpp>
 
 #include "vesc_driver/vesc_packet_factory.h"
 
@@ -63,7 +63,6 @@ public:
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
   serial::Serial serial_;
-  VescFrame::CRC send_crc_;
 };
 
 void* VescInterface::Impl::rxThread(void)

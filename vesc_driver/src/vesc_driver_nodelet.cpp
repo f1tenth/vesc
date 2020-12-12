@@ -23,10 +23,11 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 // WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <boost/shared_ptr.hpp>
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
+
+#include <memory>
 
 #include "vesc_driver/vesc_driver.h"
 
@@ -41,7 +42,7 @@ public:
 private:
   virtual void onInit(void);
 
-  boost::shared_ptr<VescDriver> vesc_driver_;
+  std::shared_ptr<VescDriver> vesc_driver_;
 };  // class VescDriverNodelet
 
 void VescDriverNodelet::onInit()

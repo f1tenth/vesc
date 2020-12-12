@@ -28,15 +28,12 @@
 #ifndef VESC_DRIVER_VESC_INTERFACE_H_
 #define VESC_DRIVER_VESC_INTERFACE_H_
 
-#include <string>
-#include <sstream>
 #include <exception>
+#include <functional>
+#include <memory>
+#include <sstream>
 #include <stdexcept>
-
-#include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <string>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -46,11 +43,11 @@ namespace vesc_driver
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface : private boost::noncopyable
+class VescInterface
 {
 public:
-  typedef boost::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef boost::function<void (const std::string&)> ErrorHandlerFunction;
+  typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
+  typedef std::function<void (const std::string&)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not
@@ -66,6 +63,12 @@ public:
   VescInterface(const std::string& port = std::string(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
+
+  /**
+   * Delete copy constructor and equals operator.
+   */
+  VescInterface(const VescInterface &) = delete;
+  VescInterface & operator=(const VescInterface &) = delete;
 
   /**
    * VescInterface destructor.
@@ -119,7 +122,7 @@ public:
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
-  boost::scoped_ptr<Impl> impl_;
+  std::unique_ptr<Impl> impl_;
 };
 
 // todo: review

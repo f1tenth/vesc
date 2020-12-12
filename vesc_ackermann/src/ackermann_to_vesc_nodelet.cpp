@@ -23,10 +23,11 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
 // WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <boost/shared_ptr.hpp>
 #include <nodelet/nodelet.h>
 #include <pluginlib/class_list_macros.h>
 #include <ros/ros.h>
+
+#include <memory>
 
 #include "vesc_ackermann/ackermann_to_vesc.h"
 
@@ -41,7 +42,7 @@ public:
 private:
   virtual void onInit(void);
 
-  boost::shared_ptr<AckermannToVesc> ackermann_to_vesc_;
+  std::shared_ptr<AckermannToVesc> ackermann_to_vesc_;
 };  // class AckermannToVescNodelet
 
 void AckermannToVescNodelet::onInit()
