@@ -51,7 +51,7 @@ public:
   virtual ~VescFrame() {}
 
   // getters
-  virtual const Buffer& frame() const
+  virtual const Buffer & frame() const
   {
     return *frame_;
   }
@@ -65,7 +65,8 @@ public:
   static const unsigned int VESC_EOF_VAL = 3;              ///< VESC end-of-frame value
 
   /** CRC parameters for the VESC */
-  static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_TYPE = { 0x1021, 0x0000, 0x0000, false, false };
+  static constexpr CRC::Parameters<crcpp_uint16,
+    16> CRC_TYPE = {0x1021, 0x0000, 0x0000, false, false};
 
 protected:
   /** Construct frame with specified payload size. */
@@ -76,7 +77,7 @@ protected:
 
 private:
   /** Construct from buffer. Used by VescPacketFactory factory. */
-  VescFrame(const BufferRangeConst& frame, const BufferRangeConst& payload);
+  VescFrame(const BufferRangeConst & frame, const BufferRangeConst & payload);
 
   /** Give VescPacketFactory access to private constructor. */
   friend class VescPacketFactory;
@@ -90,14 +91,14 @@ class VescPacket : public VescFrame
 public:
   virtual ~VescPacket() {}
 
-  virtual const std::string& name() const
+  virtual const std::string & name() const
   {
     return name_;
   }
 
 protected:
-  VescPacket(const std::string& name, int payload_size, int payload_id);
-  VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
+  VescPacket(const std::string & name, int payload_size, int payload_id);
+  VescPacket(const std::string & name, std::shared_ptr<VescFrame> raw);
 
 private:
   std::string name_;

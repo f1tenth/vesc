@@ -46,8 +46,8 @@ namespace vesc_driver
 class VescInterface
 {
 public:
-  typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef std::function<void (const std::string&)> ErrorHandlerFunction;
+  typedef std::function<void (const VescPacketConstPtr &)> PacketHandlerFunction;
+  typedef std::function<void (const std::string &)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not
@@ -60,9 +60,10 @@ public:
    *
    * @throw SerialException
    */
-  VescInterface(const std::string& port = std::string(),
-                const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
-                const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
+  VescInterface(
+    const std::string & port = std::string(),
+    const PacketHandlerFunction & packet_handler = PacketHandlerFunction(),
+    const ErrorHandlerFunction & error_handler = ErrorHandlerFunction());
 
   /**
    * Delete copy constructor and equals operator.
@@ -78,20 +79,20 @@ public:
   /**
    * Sets / updates the function that this class calls when a VESC packet is received.
    */
-  void setPacketHandler(const PacketHandlerFunction& handler);
+  void setPacketHandler(const PacketHandlerFunction & handler);
 
   /**
    * Sets / updates the function that this class calls when an error is detected, such as a bad
    * checksum.
    */
-  void setErrorHandler(const ErrorHandlerFunction& handler);
+  void setErrorHandler(const ErrorHandlerFunction & handler);
 
   /**
    * Opens the serial port interface to the VESC.
    *
    * @throw SerialException
    */
-  void connect(const std::string& port);
+  void connect(const std::string & port);
 
   /**
    * Closes the serial port interface to the VESC.
@@ -108,7 +109,7 @@ public:
   /**
    * Send a VESC packet.
    */
-  void send(const VescPacket& packet);
+  void send(const VescPacket & packet);
 
   void requestFWVersion();
   void requestState();
@@ -129,18 +130,20 @@ private:
 class SerialException : public std::exception
 {
   // Disable copy constructors
-  SerialException& operator=(const SerialException&);
+  SerialException & operator=(const SerialException &);
   std::string e_what_;
+
 public:
-  explicit SerialException(const char *description)
+  explicit SerialException(const char * description)
   {
     std::stringstream ss;
     ss << "SerialException " << description << " failed.";
     e_what_ = ss.str();
   }
-  SerialException(const SerialException& other) : e_what_(other.e_what_) {}
+  SerialException(const SerialException & other)
+  : e_what_(other.e_what_) {}
   virtual ~SerialException() throw() {}
-  virtual const char* what() const throw()
+  virtual const char * what() const throw()
   {
     return e_what_.c_str();
   }

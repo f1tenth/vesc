@@ -46,7 +46,7 @@ using std_msgs::msg::Float64;
 using vesc_msgs::msg::VescStateStamped;
 
 VescDriver::VescDriver(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("vesc_driver", options),
+: rclcpp::Node("vesc_driver", options),
   vesc_(
     std::string(),
     std::bind(&VescDriver::vescPacketCallback, this, _1),
@@ -83,7 +83,9 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
 
   // subscribe to motor and servo command topics
   duty_cycle_sub_ = create_subscription<Float64>(
-    "commands/motor/duty_cycle", rclcpp::QoS{10}, std::bind(&VescDriver::dutyCycleCallback, this, _1));
+    "commands/motor/duty_cycle", rclcpp::QoS{10}, std::bind(
+      &VescDriver::dutyCycleCallback, this,
+      _1));
   current_sub_ = create_subscription<Float64>(
     "commands/motor/current", rclcpp::QoS{10}, std::bind(&VescDriver::currentCallback, this, _1));
   brake_sub_ = create_subscription<Float64>(
@@ -115,8 +117,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
 void VescDriver::timerCallback()
 {
   // VESC interface should not unexpectedly disconnect, but test for it anyway
-  if (!vesc_.isConnected())
-  {
+  if (!vesc_.isConnected()) {
     RCLCPP_FATAL(get_logger(), "Unexpectedly disconnected from serial port.");
     rclcpp::shutdown();
     return;
@@ -127,25 +128,19 @@ void VescDriver::timerCallback()
    *  INITIALIZING - request and wait for vesc version
    *  OPERATING - receiving commands from subscriber topics
    */
-  if (driver_mode_ == MODE_INITIALIZING)
-  {
+  if (driver_mode_ == MODE_INITIALIZING) {
     // request version number, return packet will update the internal version numbers
     vesc_.requestFWVersion();
-    if (fw_version_major_ >= 0 && fw_version_minor_ >= 0)
-    {
+    if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
       RCLCPP_INFO(
         get_logger(), "Connected to VESC with firmware version %d.%d",
         fw_version_major_, fw_version_minor_);
       driver_mode_ = MODE_OPERATING;
     }
-  }
-  else if (driver_mode_ == MODE_OPERATING)
-  {
+  } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
     vesc_.requestState();
-  }
-  else
-  {
+  } else {
     // unknown mode, how did that happen?
     assert(false && "unknown driver mode");
   }
@@ -153,8 +148,7 @@ void VescDriver::timerCallback()
 
 void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & packet)
 {
-  if (packet->name() == "Values")
-  {
+  if (packet->name() == "Values") {
     std::shared_ptr<VescPacketValues const> values =
       std::dynamic_pointer_cast<VescPacketValues const>(packet);
 
@@ -175,9 +169,7 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     state_msg.state.fault_code = values->fault_code();
 
     state_pub_->publish(state_msg);
-  }
-  else if (packet->name() == "FWVersion")
-  {
+  } else if (packet->name() == "FWVersion") {
     std::shared_ptr<VescPacketFWVersion const> fw_version =
       std::dynamic_pointer_cast<VescPacketFWVersion const>(packet);
     // todo: might need lock here
@@ -198,8 +190,7 @@ void VescDriver::vescErrorCallback(const std::string & error)
  */
 void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
   }
 }
@@ -211,8 +202,7 @@ void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
  */
 void VescDriver::currentCallback(const Float64::SharedPtr current)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     vesc_.setCurrent(current_limit_.clip(current->data));
   }
 }
@@ -224,8 +214,7 @@ void VescDriver::currentCallback(const Float64::SharedPtr current)
  */
 void VescDriver::brakeCallback(const Float64::SharedPtr brake)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     vesc_.setBrake(brake_limit_.clip(brake->data));
   }
 }
@@ -238,8 +227,7 @@ void VescDriver::brakeCallback(const Float64::SharedPtr brake)
  */
 void VescDriver::speedCallback(const Float64::SharedPtr speed)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     vesc_.setSpeed(speed_limit_.clip(speed->data));
   }
 }
@@ -250,8 +238,7 @@ void VescDriver::speedCallback(const Float64::SharedPtr speed)
  */
 void VescDriver::positionCallback(const Float64::SharedPtr position)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     // ROS uses radians but VESC seems to use degrees. Convert to degrees.
     double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
     vesc_.setPosition(position_deg);
@@ -263,8 +250,7 @@ void VescDriver::positionCallback(const Float64::SharedPtr position)
  */
 void VescDriver::servoCallback(const Float64::SharedPtr servo)
 {
-  if (driver_mode_ = MODE_OPERATING)
-  {
+  if (driver_mode_ = MODE_OPERATING) {
     double servo_clipped(servo_limit_.clip(servo->data));
     vesc_.setServo(servo_clipped);
     // publish clipped servo value as a "sensor"
@@ -277,39 +263,31 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 VescDriver::CommandLimit::CommandLimit(
   rclcpp::Node * node_ptr,
   const std::string & str,
-  const boost::optional<double>& min_lower,
-  const boost::optional<double>& max_upper)
-  : node_ptr(node_ptr),
-    logger(node_ptr->get_logger()),
-    name(str)
+  const boost::optional<double> & min_lower,
+  const boost::optional<double> & max_upper)
+: node_ptr(node_ptr),
+  logger(node_ptr->get_logger()),
+  name(str)
 {
   // check if user's minimum value is outside of the range min_lower to max_upper
   auto param_min =
     node_ptr->declare_parameter(name + "_min", rclcpp::ParameterValue(0.0));
 
-  if (param_min.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET)
-  {
-    if (min_lower && param_min.get<double>() < *min_lower)
-    {
+  if (param_min.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+    if (min_lower && param_min.get<double>() < *min_lower) {
       lower = *min_lower;
       RCLCPP_WARN_STREAM(
         logger, "Parameter " << name << "_min (" << param_min.get<double>() <<
-        ") is less than the feasible minimum (" << *min_lower << ").");
-    }
-    else if (max_upper && param_min.get<double>() > *max_upper)
-    {
+          ") is less than the feasible minimum (" << *min_lower << ").");
+    } else if (max_upper && param_min.get<double>() > *max_upper) {
       lower = *max_upper;
       RCLCPP_WARN_STREAM(
         logger, "Parameter " << name << "_min (" << param_min.get<double>() <<
-        ") is greater than the feasible maximum (" << *max_upper << ").");
-    }
-    else
-    {
+          ") is greater than the feasible maximum (" << *max_upper << ").");
+    } else {
       lower = param_min.get<double>();
     }
-  }
-  else if (min_lower)
-  {
+  } else if (min_lower) {
     lower = *min_lower;
   }
 
@@ -317,38 +295,29 @@ VescDriver::CommandLimit::CommandLimit(
   auto param_max =
     node_ptr->declare_parameter(name + "_max", rclcpp::ParameterValue(0.0));
 
-  if (param_max.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET)
-  {
-    if (min_lower && param_max.get<double>() < *min_lower)
-    {
+  if (param_max.get_type() != rclcpp::ParameterType::PARAMETER_NOT_SET) {
+    if (min_lower && param_max.get<double>() < *min_lower) {
       upper = *min_lower;
       RCLCPP_WARN_STREAM(
         logger, "Parameter " << name << "_max (" << param_max.get<double>() <<
-        ") is less than the feasible minimum (" << *min_lower << ").");
-    }
-    else if (max_upper && param_max.get<double>() > *max_upper)
-    {
+          ") is less than the feasible minimum (" << *min_lower << ").");
+    } else if (max_upper && param_max.get<double>() > *max_upper) {
       upper = *max_upper;
       RCLCPP_WARN_STREAM(
         logger, "Parameter " << name << "_max (" << param_max.get<double>() <<
-        ") is greater than the feasible maximum (" << *max_upper << ").");
-    }
-    else
-    {
+          ") is greater than the feasible maximum (" << *max_upper << ").");
+    } else {
       upper = param_max.get<double>();
     }
-  }
-  else if (max_upper)
-  {
+  } else if (max_upper) {
     upper = *max_upper;
   }
 
   // check for min > max
-  if (upper && lower && *lower > *upper)
-  {
+  if (upper && lower && *lower > *upper) {
     RCLCPP_WARN_STREAM(
       logger, "Parameter " << name << "_max (" << *upper <<
-      ") is less than parameter " << name << "_min (" << *lower << ").");
+        ") is less than parameter " << name << "_min (" << *lower << ").");
     double temp(*lower);
     lower = *upper;
     upper = temp;
@@ -376,15 +345,13 @@ double VescDriver::CommandLimit::clip(double value)
 {
   auto clock = rclcpp::Clock(RCL_ROS_TIME);
 
-  if (lower && value < lower)
-  {
+  if (lower && value < lower) {
     RCLCPP_INFO_THROTTLE(
       logger, clock, 10, "%s command value (%f) below minimum limit (%f), clipping.",
       name.c_str(), value, *lower);
     return *lower;
   }
-  if (upper && value > upper)
-  {
+  if (upper && value > upper) {
     RCLCPP_INFO_THROTTLE(
       logger, clock, 10, "%s command value (%f) above maximum limit (%f), clipping.",
       name.c_str(), value, *upper);

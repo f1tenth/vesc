@@ -47,7 +47,7 @@ class VescPacketFactory
 {
 public:
   /** Return the global factory object */
-  static VescPacketFactory* getFactory();
+  static VescPacketFactory * getFactory();
 
   /**
    * Create a VescPacket from a buffer (factory function). Packet must start (start of frame
@@ -69,9 +69,10 @@ public:
    *
    * @return Pointer to a valid VescPacket if successful. Otherwise, an empty pointer.
    */
-  static VescPacketPtr createPacket(const Buffer::const_iterator& begin,
-                                    const Buffer::const_iterator& end,
-                                    int* num_bytes_needed, std::string* what);
+  static VescPacketPtr createPacket(
+    const Buffer::const_iterator & begin,
+    const Buffer::const_iterator & end,
+    int * num_bytes_needed, std::string * what);
 
   typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
 
@@ -86,8 +87,8 @@ public:
 
 private:
   VescPacketFactory();
-  typedef std::map<int, CreateFn > FactoryMap;
-  static FactoryMap* getMap();
+  typedef std::map<int, CreateFn> FactoryMap;
+  static FactoryMap * getMap();
 };
 
 template<typename PACKETTYPE>
@@ -107,7 +108,7 @@ public:
 
 /** Use this macro to register packets */
 #define REGISTER_PACKET_TYPE(id, klass) \
-static PacketFactoryTemplate<klass> global_##klass##Factory((id));
+  static PacketFactoryTemplate<klass> global_ ## klass ## Factory((id));
 
 }  // namespace vesc_driver
 

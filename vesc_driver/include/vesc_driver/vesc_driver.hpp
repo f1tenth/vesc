@@ -48,7 +48,7 @@ using vesc_msgs::msg::VescState;
 using vesc_msgs::msg::VescStateStamped;
 
 class VescDriver
-: public rclcpp::Node
+  : public rclcpp::Node
 {
 public:
   VescDriver(const rclcpp::NodeOptions & options);
@@ -65,8 +65,8 @@ private:
     CommandLimit(
       rclcpp::Node * node_ptr,
       const std::string & str,
-      const boost::optional<double>& min_lower = boost::optional<double>(),
-      const boost::optional<double>& max_upper = boost::optional<double>());
+      const boost::optional<double> & min_lower = boost::optional<double>(),
+      const boost::optional<double> & max_upper = boost::optional<double>());
     double clip(double value);
     rclcpp::Node * node_ptr;
     rclcpp::Logger logger;
