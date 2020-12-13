@@ -363,5 +363,8 @@ double VescDriver::CommandLimit::clip(double value)
   return value;
 }
 
-
 }  // namespace vesc_driver
+
+#include "rclcpp_components/register_node_macro.hpp"  // NOLINT
+
+RCLCPP_COMPONENTS_REGISTER_NODE(vesc_driver::VescDriver)

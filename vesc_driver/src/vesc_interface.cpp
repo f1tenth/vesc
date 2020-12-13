@@ -59,10 +59,8 @@ public:
   bool rx_thread_run_;
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
-  boost::asio::serial_port serial_port_;
-
-private:
   boost::asio::io_service io_service_;
+  boost::asio::serial_port serial_port_;
 };
 
 void VescInterface::Impl::rxThread()
@@ -211,7 +209,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->rx_thread_run_ = false;
-    impl_->rx_thread_->join();
+    // impl_->rx_thread_->join();
     impl_->serial_port_.close();
   }
 }

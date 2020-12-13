@@ -13,16 +13,27 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
+find_package(Boost COMPONENTS system REQUIRED)
+find_package(Threads)
+
 ###########
 ## Build ##
 ###########
 
-# node executable
-ament_auto_add_library(${PROJECT_NAME}_node SHARED
+# node library
+ament_auto_add_library(${PROJECT_NAME} SHARED
   src/vesc_driver.cpp
   src/vesc_interface.cpp
   src/vesc_packet.cpp
   src/vesc_packet_factory.cpp
+)
+target_link_libraries(${PROJECT_NAME}
+  ${Boost_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT}
+)
+rclcpp_components_register_node(${PROJECT_NAME}
+  PLUGIN vesc_driver::VescDriver
+  EXECUTABLE ${PROJECT_NAME}_node
 )
 
 #############
@@ -37,5 +48,4 @@ endif()
 ament_auto_package(
   INSTALL_TO_SHARE
     launch
-    param
 )

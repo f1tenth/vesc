@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="node_name" default="vesc_driver_node" />
+
+  <!-- Optionally launch in GDB, for debugging -->
+  <arg name="debug" default="false" />
+  <let name="launch_prefix" value="xterm -e gdb --args" if="$(var debug)" />
+
+  <!-- VESC driver parameters -->
+  <arg name="port" default="/dev/ttyUSB0" />
+
+  <!-- VESC driver node -->
+  <node pkg="vesc_driver" exec="vesc_driver_node" name="$(var node_name)" output="screen">
+    <param name="port" value="$(var port)" />
+  </node>
+</launch>
