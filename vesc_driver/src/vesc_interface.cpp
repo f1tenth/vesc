@@ -1,43 +1,46 @@
 // Copyright 2020 F1TENTH Foundation
 //
-// Redistribution and use in source and binary forms, with or without modification, are permitted
-// provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
-// 1. Redistributions of source code must retain the above copyright notice, this list of conditions
-//    and the following disclaimer.
+//   * Redistributions of source code must retain the above copyright
+//     notice, this list of conditions and the following disclaimer.
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other materials
-//    provided with the distribution.
+//   * Redistributions in binary form must reproduce the above copyright
+//     notice, this list of conditions and the following disclaimer in the
+//     documentation and/or other materials provided with the distribution.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used
-//    to endorse or promote products derived from this software without specific prior
-//    written permission.
+//   * Neither the name of the {copyright_holder} nor the names of its
+//     contributors may be used to endorse or promote products derived from
+//     this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
-// WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 // -*- mode:c++; fill-column: 100; -*-
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet_factory.hpp"
 
-#include <boost/array.hpp>
 #include <boost/asio.hpp>
-#include <pthread.h>
 
 #include <algorithm>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <thread>
 
 namespace vesc_driver
 {
@@ -50,14 +53,9 @@ public:
     serial_port_(io_service_)
   {}
 
-  void * rxThread(void);
+  void rxThread();
 
-  static void * rxThreadHelper(void * context)
-  {
-    return ((VescInterface::Impl *)context)->rxThread();
-  }
-
-  pthread_t rx_thread_;
+  std::unique_ptr<std::thread> rx_thread_;
   bool rx_thread_run_;
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
@@ -67,7 +65,7 @@ private:
   boost::asio::io_service io_service_;
 };
 
-void * VescInterface::Impl::rxThread(void)
+void VescInterface::Impl::rxThread()
 {
   Buffer buffer;
   buffer.reserve(4096);
@@ -201,9 +199,9 @@ void VescInterface::connect(const std::string & port)
 
   // start up a monitoring thread
   impl_->rx_thread_run_ = true;
-  int result =
-    pthread_create(&impl_->rx_thread_, NULL, &VescInterface::Impl::rxThreadHelper, impl_.get());
-  assert(0 == result);
+  impl_->rx_thread_ = std::unique_ptr<std::thread>(
+    new std::thread(
+      &VescInterface::Impl::rxThread, impl_.get()));
 }
 
 void VescInterface::disconnect()
@@ -213,9 +211,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->rx_thread_run_ = false;
-    int result = pthread_join(impl_->rx_thread_, NULL);
-    assert(0 == result);
-
+    impl_->rx_thread_->join();
     impl_->serial_port_.close();
   }
 }
