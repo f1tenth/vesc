@@ -22,7 +22,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
-  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
   <depend>vesc_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

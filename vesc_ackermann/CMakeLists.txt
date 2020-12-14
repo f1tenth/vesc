@@ -33,7 +33,6 @@ rclcpp_components_register_node(${PROJECT_NAME}
   EXECUTABLE vesc_to_odom_node
 )
 
-
 #############
 ## Testing ##
 #############
