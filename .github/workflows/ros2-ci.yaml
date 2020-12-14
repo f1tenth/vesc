@@ -1,30 +1,36 @@
-name: ROS1 CI Workflow
+name: ROS2 CI Workflow
 
 on:
   pull_request:
+    branches:
+      - ros2
   push:
     branches:
-      - main
+      - ros2
 
 jobs:
 
-  build-ros1:
+  build-ros2:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        ros-version: [dashing, foxy]
+        include:
+          - ros-version: dashing
+            image: ros:dashing
+          - ros-version: foxy
+            image: ros:foxy
     container:
-      image: ros:melodic
+      image: ${{ matrix.image }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
       - name: Create Workspace
         run: |
-          mkdir -p src_tmp/vesc; \
-          mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/vesc/; \
-          mv src_tmp/ src/; \
-          cd src; \
-          bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
-          catkin_init_workspace'
+          mkdir -p src_tmp/vesc
+          mv `find -maxdepth 1 -not -name . -not -name src_tmp` src_tmp/vesc/
+          mv src_tmp/ src/
       - name: Install Dependencies
         run: |
           bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
@@ -33,9 +39,9 @@ jobs:
       - name: Build Workspace
         run: |
           bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
-          catkin_make'
+          colcon build --event-handlers console_cohesion+'
       - name: Run Tests
         run: |
           bash -c 'source /opt/ros/$ROS_DISTRO/setup.bash; \
-          catkin_make run_tests; \
-          catkin_test_results --verbose'
+          colcon test --event-handlers console_cohesion+; \
+          colcon test-result --verbose'
