@@ -12,17 +12,8 @@ jobs:
 
   build-ros2:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ros-version: [dashing, foxy]
-        include:
-          - ros-version: dashing
-            image: ros:dashing
-          - ros-version: foxy
-            image: ros:foxy
     container:
-      image: ${{ matrix.image }}
+      image: ros:foxy
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
