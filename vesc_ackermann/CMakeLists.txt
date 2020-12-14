@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.5)
 project(vesc_ackermann)
 
 # Setting C++ standard to 14
-if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+if(NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
   message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+elseif("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
   message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
   set(CMAKE_CXX_STANDARD 14)
 endif()
@@ -17,24 +17,22 @@ ament_auto_find_build_dependencies()
 ## Build ##
 ###########
 
-# node executable
-ament_auto_add_executable(vesc_to_odom_node
-  src/vesc_to_odom_node.cpp
+# nodes library
+ament_auto_add_library(${PROJECT_NAME} SHARED
   src/vesc_to_odom.cpp
-)
-
-ament_auto_add_executable(ackermann_to_vesc_node
-  src/ackermann_to_vesc_node.cpp
   src/ackermann_to_vesc.cpp
 )
 
-# components library
-ament_auto_add_library(vesc_ackermann_nodelet
-  src/ackermann_to_vesc_nodelet.cpp
-  src/ackermann_to_vesc.cpp
-  src/vesc_to_odom_nodelet.cpp
-  src/vesc_to_odom.cpp
+# register nodes as components
+rclcpp_components_register_node(${PROJECT_NAME}
+  PLUGIN vesc_ackermann::AckermannToVesc
+  EXECUTABLE ackermann_to_vesc_node
 )
+rclcpp_components_register_node(${PROJECT_NAME}
+  PLUGIN vesc_ackermann::VescToOdom
+  EXECUTABLE vesc_to_odom_node
+)
+
 
 #############
 ## Testing ##
