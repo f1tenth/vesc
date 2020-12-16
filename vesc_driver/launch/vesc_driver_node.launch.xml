@@ -7,7 +7,7 @@
   <let name="launch_prefix" value="xterm -e gdb --args" if="$(var debug)" />
 
   <!-- VESC driver parameters -->
-  <arg name="port" default="/dev/ttyUSB0" />
+  <arg name="port" default="/dev/sensors/vesc" />
 
   <!-- VESC driver node -->
   <node pkg="vesc_driver" exec="vesc_driver_node" name="$(var node_name)" output="screen">
