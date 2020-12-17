@@ -7,10 +7,22 @@
   <let name="launch_prefix" value="xterm -e gdb --args" if="$(var debug)" />
 
   <!-- VESC driver parameters -->
-  <arg name="port" default="/dev/sensors/vesc" />
+  <arg name="port" default="/dev/ttyACM0" />
 
   <!-- VESC driver node -->
   <node pkg="vesc_driver" exec="vesc_driver_node" name="$(var node_name)" output="screen">
     <param name="port" value="$(var port)" />
+    <param name="brake_max" value="200000.0" />
+    <param name="brake_min" value="-20000.0" />
+    <param name="current_max" value="100.0" />
+    <param name="current_min" value="0.0" />
+    <param name="duty_cycle_max" value="0.0" />
+    <param name="duty_cycle_min" value="0.0" />
+    <param name="position_max" value="0.0" />
+    <param name="position_min" value="0.0" />
+    <param name="servo_max" value="0.85" />
+    <param name="servo_min" value="0.15" />
+    <param name="speed_max" value="23250.0" />
+    <param name="speed_min" value="-23250.0" />
   </node>
 </launch>
