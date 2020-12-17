@@ -209,7 +209,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->rx_thread_run_ = false;
-    // impl_->rx_thread_->join();
+    impl_->rx_thread_->join();
     impl_->serial_port_.close();
   }
 }
