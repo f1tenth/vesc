@@ -40,7 +40,9 @@
 namespace vesc_ackermann
 {
 
+using ackermann_msgs::msg::AckermannDriveStamped;
 using std::placeholders::_1;
+using std_msgs::msg::Float64;
 
 AckermannToVesc::AckermannToVesc(const rclcpp::NodeOptions & options)
 : Node("ackermann_to_vesc_node", options)

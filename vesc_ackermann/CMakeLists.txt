@@ -19,8 +19,8 @@ ament_auto_find_build_dependencies()
 
 # nodes library
 ament_auto_add_library(${PROJECT_NAME} SHARED
-  src/vesc_to_odom.cpp
   src/ackermann_to_vesc.cpp
+  src/vesc_to_odom.cpp
 )
 
 # register nodes as components

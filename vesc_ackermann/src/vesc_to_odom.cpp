@@ -31,6 +31,7 @@
 #include "vesc_ackermann/vesc_to_odom.hpp"
 
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 #include <cmath>
 #include <string>
@@ -41,6 +42,7 @@ namespace vesc_ackermann
 using geometry_msgs::msg::TransformStamped;
 using nav_msgs::msg::Odometry;
 using std::placeholders::_1;
+using vesc_msgs::msg::VescStateStamped;
 
 VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
 : Node("vesc_to_odom_node", options),
