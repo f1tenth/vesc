@@ -129,15 +129,17 @@ void VescInterface::Impl::rxThread()
     // attempt to read at least bytes_needed bytes from the serial port
     int bytes_to_read = std::max(bytes_needed, 4096);
 
-    std::lock_guard<std::mutex> lock(serial_mutex_);
+    {
+      std::lock_guard<std::mutex> lock(serial_mutex_);
 
-    const size_t bytes_read = boost::asio::read(
-      serial_port_,
-      boost::asio::buffer(buffer, buffer.size()),
-      boost::asio::transfer_exactly(bytes_to_read));
+      const size_t bytes_read = boost::asio::read(
+        serial_port_,
+        boost::asio::buffer(buffer, buffer.size()),
+        boost::asio::transfer_exactly(bytes_to_read));
 
-    if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
-      error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
+      if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
+        error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
+      }
     }
 
     // Only attempt to read every 10 ms
@@ -216,9 +218,10 @@ void VescInterface::disconnect()
 
   if (isConnected()) {
     // bring down read thread
-    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     impl_->rx_thread_run_ = false;
     impl_->rx_thread_->join();
+
+    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     impl_->serial_port_.close();
   }
 }
