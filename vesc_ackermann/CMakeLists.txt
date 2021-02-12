@@ -11,6 +11,7 @@ elseif("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(ackermann_msgs REQUIRED)
 ament_auto_find_build_dependencies()
 
 ###########
@@ -21,6 +22,10 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/ackermann_to_vesc.cpp
   src/vesc_to_odom.cpp
+)
+
+ament_target_dependencies(${PROJECT_NAME}
+  ackermann_msgs
 )
 
 # register nodes as components
