@@ -31,7 +31,6 @@
 #ifndef VESC_DRIVER__VESC_DRIVER_HPP_
 #define VESC_DRIVER__VESC_DRIVER_HPP_
 
-#include <boost/optional.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <vesc_msgs/msg/vesc_state.hpp>
@@ -68,14 +67,14 @@ private:
     CommandLimit(
       rclcpp::Node * node_ptr,
       const std::string & str,
-      const boost::optional<double> & min_lower = boost::optional<double>(),
-      const boost::optional<double> & max_upper = boost::optional<double>());
+      const std::optional<double> & min_lower = std::optional<double>(),
+      const std::optional<double> & max_upper = std::optional<double>());
     double clip(double value);
     rclcpp::Node * node_ptr;
     rclcpp::Logger logger;
     std::string name;
-    boost::optional<double> lower;
-    boost::optional<double> upper;
+    std::optional<double> lower;
+    std::optional<double> upper;
   };
 
   CommandLimit duty_cycle_limit_;

@@ -65,12 +65,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   fw_version_minor_(-1)
 {
   // get vesc serial port address
-  /* default to /tmp/ttyV0 for debug purpose
-   * use :
-   *  socat /dev/ttyACM0,raw,echo=0  SYSTEM:'tee in.txt |socat - "PTY,link=/tmp/ttyV0,raw,echo=0,waitslave" |tee out.txt'
-   * to sniff comunication data to and from vesc
-   */
-  std::string port = declare_parameter<std::string>("port", "/tmp/ttyV0");
+  std::string port = declare_parameter<std::string>("port", "/dev/ttyACM0");
 
   // attempt to connect to the serial port
   try {
@@ -299,8 +294,8 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 VescDriver::CommandLimit::CommandLimit(
   rclcpp::Node * node_ptr,
   const std::string & str,
-  const boost::optional<double> & min_lower,
-  const boost::optional<double> & max_upper)
+  const std::optional<double> & min_lower,
+  const std::optional<double> & max_upper)
 : node_ptr(node_ptr),
   logger(node_ptr->get_logger()),
   name(str)

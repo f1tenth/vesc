@@ -1,19 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 project(vesc_driver)
 
-# Set minimum C++ standard to C++14
-if(NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-elseif("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
-  set(CMAKE_CXX_STANDARD 14)
-endif()
-
+# Set minimum C++ standard to C++17
+#if(NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+#  message(STATUS "Changing CXX_STANDARD from C++98 to C++17")
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+#elseif("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+#  message(STATUS "Changing CXX_STANDARD from C++98 to C++17")
+#  set(CMAKE_CXX_STANDARD 17)
+#endif()
+set(CMAKE_CXX_STANDARD 17)
 find_package(ament_cmake_auto REQUIRED)
+find_package(serial_driver REQUIRED)
 ament_auto_find_build_dependencies()
 
-find_package(Boost COMPONENTS system REQUIRED)
 find_package(Threads)
 
 ###########
@@ -28,7 +28,6 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/vesc_packet_factory.cpp
 )
 target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
 )
 rclcpp_components_register_node(${PROJECT_NAME}
@@ -48,4 +47,5 @@ endif()
 ament_auto_package(
   INSTALL_TO_SHARE
     launch
+    params
 )
