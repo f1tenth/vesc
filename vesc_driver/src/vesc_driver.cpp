@@ -65,7 +65,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   fw_version_minor_(-1)
 {
   // get vesc serial port address
-  std::string port = declare_parameter<std::string>("port", "");
+  std::string port = declare_parameter<std::string>("port", "/dev/ttyACM0");
 
   // attempt to connect to the serial port
   try {
@@ -266,8 +266,8 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 VescDriver::CommandLimit::CommandLimit(
   rclcpp::Node * node_ptr,
   const std::string & str,
-  const boost::optional<double> & min_lower,
-  const boost::optional<double> & max_upper)
+  const std::optional<double> & min_lower,
+  const std::optional<double> & max_upper)
 : node_ptr(node_ptr),
   logger(node_ptr->get_logger()),
   name(str)
