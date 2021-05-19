@@ -148,10 +148,12 @@ void VescInterface::Impl::rxThread()
 }
 
 VescInterface::VescInterface(
+  const int vesc_id,
   const std::string & port,
   const PacketHandlerFunction & packet_handler,
   const ErrorHandlerFunction & error_handler)
-: impl_(new Impl())
+: impl_(new Impl()),
+master_vesc_id_(vesc_id)
 {
   setPacketHandler(packet_handler);
   setErrorHandler(error_handler);
@@ -250,44 +252,107 @@ void VescInterface::send(const VescPacket & packet)
   }
 }
 
-void VescInterface::requestFWVersion()
+void VescInterface::requestFWVersion(int vesc_id)
 {
-  send(VescPacketRequestFWVersion());
+
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    //ROS_INFO("MASTER"); 
+     VescPacketRequestFWVersion pay;
+/*
+     std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
+     for(int i=0; i < pay.frame().size(); i++)
+         std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
+     
+     std::cout <<std::endl <<"--------------------------------------"<<std::endl;
+*/
+
+     send(pay);
+  }else{
+     //ROS_INFO("FFW");  
+     VescPacketCanForwardRequest  pay(vesc_id,VescPacketRequestFWVersion());
+/*
+     std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
+     for(int i=0; i < pay.frame().size(); i++)
+         std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
+     
+     std::cout <<std::endl <<"--------------------------------------"<<std::endl;
+*/
+     send(pay);
+  }
 }
 
-void VescInterface::requestState()
+void VescInterface::requestState(int vesc_id)
 {
-  send(VescPacketRequestValues());
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+   send(VescPacketRequestValues());
+  } else {
+   VescPacketCanForwardRequest  pay(vesc_id,VescPacketRequestValues());
+    send(pay);
+  }  
 }
 
-void VescInterface::setDutyCycle(double duty_cycle)
+void VescInterface::setDutyCycle(int vesc_id,double duty_cycle)
 {
-  send(VescPacketSetDuty(duty_cycle));
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetDuty(duty_cycle));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetDuty(duty_cycle));
+    send(pay);
+  } 
 }
 
-void VescInterface::setCurrent(double current)
+void VescInterface::setCurrent(int vesc_id,double current)
 {
-  send(VescPacketSetCurrent(current));
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetCurrent(current));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetCurrent(current));
+    send(pay);
+  } 
+
+  
 }
 
-void VescInterface::setBrake(double brake)
+void VescInterface::setBrake(int vesc_id,double brake)
 {
-  send(VescPacketSetCurrentBrake(brake));
+  
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetCurrentBrake(brake));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetCurrentBrake(brake));
+    send(pay);
+  } 
 }
 
-void VescInterface::setSpeed(double speed)
+void VescInterface::setSpeed(int vesc_id,double speed)
 {
-  send(VescPacketSetRPM(speed));
+  
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetRPM(speed));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetRPM(speed));
+    send(pay);
+  }
 }
 
-void VescInterface::setPosition(double position)
+void VescInterface::setPosition(int vesc_id,double position)
 {
-  send(VescPacketSetPos(position));
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetPos(position));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetPos(position));
+    send(pay);
+  }
 }
 
-void VescInterface::setServo(double servo)
+void VescInterface::setServo(int vesc_id,double servo)
 {
-  send(VescPacketSetServoPos(servo));
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+    send(VescPacketSetServoPos(servo));
+    } else {
+    VescPacketCanForwardRequest  pay(vesc_id,VescPacketSetServoPos(servo));
+    send(pay);
+  }
 }
 
 }  // namespace vesc_driver

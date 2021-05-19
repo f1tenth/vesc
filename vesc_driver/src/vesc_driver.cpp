@@ -51,6 +51,7 @@ using vesc_msgs::msg::VescStateStamped;
 VescDriver::VescDriver(const rclcpp::NodeOptions & options)
 : rclcpp::Node("vesc_driver", options),
   vesc_(
+    0,
     std::string(),
     std::bind(&VescDriver::vescPacketCallback, this, _1),
     std::bind(&VescDriver::vescErrorCallback, this, _1)),
@@ -78,7 +79,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
 
   // create vesc state (telemetry) publisher
   state_pub_ = create_publisher<VescStateStamped>("sensors/core", rclcpp::QoS{10});
-
+  imu_pub_ = create_publisher<VescImuStamped>("sensors/imu", rclcpp::QoS{10});
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
   servo_sensor_pub_ = create_publisher<Float64>(
@@ -133,7 +134,7 @@ void VescDriver::timerCallback()
    */
   if (driver_mode_ == MODE_INITIALIZING) {
     // request version number, return packet will update the internal version numbers
-    vesc_.requestFWVersion();
+    vesc_.requestFWVersion(0);
     if (fw_version_major_ >= 0 && fw_version_minor_ >= 0) {
       RCLCPP_INFO(
         get_logger(), "Connected to VESC with firmware version %d.%d",
@@ -142,7 +143,9 @@ void VescDriver::timerCallback()
     }
   } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
-    vesc_.requestState();
+    vesc_.requestState(0);
+    //vesc_.requestImuData(0);
+
   } else {
     // unknown mode, how did that happen?
     assert(false && "unknown driver mode");
@@ -158,18 +161,30 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     auto state_msg = VescStateStamped();
     state_msg.header.stamp = now();
     state_msg.state.voltage_input = values->v_in();
-    state_msg.state.temperature_pcb = values->temp_pcb();
-    state_msg.state.current_motor = values->current_motor();
-    state_msg.state.current_input = values->current_in();
-    state_msg.state.speed = values->rpm();
-    state_msg.state.duty_cycle = values->duty_now();
+    
+    state_msg.state.current_motor = values->avg_motor_current();
+    state_msg.state.current_input = values->avg_input_current();
+    state_msg.state.avg_id        = values->avg_id();
+    state_msg.state.avg_iq        = values->avg_iq();
+    state_msg.state.duty_cycle    = values->duty_cycle_now();
+    state_msg.state.speed         = values->rpm();
+    
     state_msg.state.charge_drawn = values->amp_hours();
     state_msg.state.charge_regen = values->amp_hours_charged();
     state_msg.state.energy_drawn = values->watt_hours();
     state_msg.state.energy_regen = values->watt_hours_charged();
     state_msg.state.displacement = values->tachometer();
     state_msg.state.distance_traveled = values->tachometer_abs();
-    state_msg.state.fault_code = values->fault_code();
+    state_msg.state.fault_code   = values->fault_code();
+
+    state_msg.state.pid_pos_now    = values->pid_pos_now();
+    state_msg.state.controller_id  = values->controller_id();
+
+    state_msg.state.ntc_temp_mos1  = values->temp_mos1();
+    state_msg.state.ntc_temp_mos2  = values->temp_mos2();
+    state_msg.state.ntc_temp_mos3  = values->temp_mos3();
+    state_msg.state.avg_vd         = values->avg_vd();
+    state_msg.state.avg_vq         = values->avg_vq();
 
     state_pub_->publish(state_msg);
   } else if (packet->name() == "FWVersion") {
@@ -178,7 +193,60 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     // todo: might need lock here
     fw_version_major_ = fw_version->fwMajor();
     fw_version_minor_ = fw_version->fwMinor();
+
+    RCLCPP_INFO(
+        get_logger(), 
+        "-=%s=- hardware paired %d",
+     fw_version->hwname().c_str(),
+     fw_version->paired()
+     );
+
+  } else if (packet->name() == "ImuData") {
+      std::shared_ptr<VescPacketImu const> imuData =
+      std::dynamic_pointer_cast<VescPacketImu const>(packet);
+
+      auto imu_msg = VescImuStamped();
+      imu_msg.header.stamp = now();
+      //imu_msg->imu.mask     = imuData->mask();
+      imu_msg.imu.ypr.x    = imuData->roll();    
+      imu_msg.imu.ypr.y    = imuData->pitch();
+      imu_msg.imu.ypr.z    = imuData->yaw(); 
+
+      imu_msg.imu.linear_acceleration.x = imuData->acc_x();
+      imu_msg.imu.linear_acceleration.y = imuData->acc_y();
+      imu_msg.imu.linear_acceleration.z = imuData->acc_z();  
+
+
+      imu_msg.imu.angular_velocity.x = imuData->gyr_x();
+      imu_msg.imu.angular_velocity.y = imuData->gyr_y();
+      imu_msg.imu.angular_velocity.z = imuData->gyr_z();  
+
+
+      imu_msg.imu.compass.x = imuData->mag_x();
+      imu_msg.imu.compass.y = imuData->mag_y();
+      imu_msg.imu.compass.z = imuData->mag_z();    
+
+      imu_msg.imu.orientation.w = imuData->q_w();
+      imu_msg.imu.orientation.x = imuData->q_x();
+      imu_msg.imu.orientation.y = imuData->q_y();
+      imu_msg.imu.orientation.z = imuData->q_z(); 
+
+      imu_pub_->publish(imu_msg);
+  } else if(packet->name() == "CanForward") {
+      std::shared_ptr<VescPacketCanForward const> canData =
+      std::dynamic_pointer_cast<VescPacketCanForward const>(packet);
+
+     uint8_t vid= canData->vesc_id();
+
+     RCLCPP_INFO(
+        get_logger(), 
+        "%d command value ",
+                      vid);
   }
+
+  RCLCPP_INFO(
+        get_logger(), 
+        "%s packet received",packet->name().c_str());
 }
 
 void VescDriver::vescErrorCallback(const std::string & error)
@@ -194,7 +262,7 @@ void VescDriver::vescErrorCallback(const std::string & error)
 void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
 {
   if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
+    vesc_.setDutyCycle(0,duty_cycle_limit_.clip(duty_cycle->data));
   }
 }
 
@@ -206,7 +274,7 @@ void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
 void VescDriver::currentCallback(const Float64::SharedPtr current)
 {
   if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setCurrent(current_limit_.clip(current->data));
+    vesc_.setCurrent(0,current_limit_.clip(current->data));
   }
 }
 
@@ -218,7 +286,7 @@ void VescDriver::currentCallback(const Float64::SharedPtr current)
 void VescDriver::brakeCallback(const Float64::SharedPtr brake)
 {
   if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setBrake(brake_limit_.clip(brake->data));
+    vesc_.setBrake(0,brake_limit_.clip(brake->data));
   }
 }
 
@@ -231,7 +299,7 @@ void VescDriver::brakeCallback(const Float64::SharedPtr brake)
 void VescDriver::speedCallback(const Float64::SharedPtr speed)
 {
   if (driver_mode_ = MODE_OPERATING) {
-    vesc_.setSpeed(speed_limit_.clip(speed->data));
+    vesc_.setSpeed(0,speed_limit_.clip(speed->data));
   }
 }
 
@@ -244,7 +312,7 @@ void VescDriver::positionCallback(const Float64::SharedPtr position)
   if (driver_mode_ = MODE_OPERATING) {
     // ROS uses radians but VESC seems to use degrees. Convert to degrees.
     double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
-    vesc_.setPosition(position_deg);
+    vesc_.setPosition(0,position_deg);
   }
 }
 
@@ -255,7 +323,7 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 {
   if (driver_mode_ = MODE_OPERATING) {
     double servo_clipped(servo_limit_.clip(servo->data));
-    vesc_.setServo(servo_clipped);
+    vesc_.setServo(0,servo_clipped);
     // publish clipped servo value as a "sensor"
     auto servo_sensor_msg = Float64();
     servo_sensor_msg.data = servo_clipped;

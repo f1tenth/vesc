@@ -64,6 +64,7 @@ public:
    * @throw SerialException
    */
   VescInterface(
+    const int vesc_id,
     const std::string & port = std::string(),
     const PacketHandlerFunction & packet_handler = PacketHandlerFunction(),
     const ErrorHandlerFunction & error_handler = ErrorHandlerFunction());
@@ -114,19 +115,21 @@ public:
    */
   void send(const VescPacket & packet);
 
-  void requestFWVersion();
-  void requestState();
-  void setDutyCycle(double duty_cycle);
-  void setCurrent(double current);
-  void setBrake(double brake);
-  void setSpeed(double speed);
-  void setPosition(double position);
-  void setServo(double servo);
-
+  void requestFWVersion(int vesc_id);
+  void requestState(int vesc_id);
+  void requestImuData(int vesc_id);
+  void setDutyCycle(int vesc_id,double duty_cycle);
+  void setCurrent(int vesc_id,double current);
+  void setBrake(int vesc_id,double brake);
+  void setSpeed(int vesc_id,double speed);
+  void setPosition(int vesc_id,double position);
+  void setServo(int vesc_id,double servo);
+  
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  const int master_vesc_id_;
 };
 
 // todo: review
