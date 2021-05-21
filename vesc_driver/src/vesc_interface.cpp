@@ -157,8 +157,8 @@ void VescInterface::Impl::rxThread()
       }
     }
 
-    // Only attempt to read every 10 ms
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    // Only attempt to read every 1 ms
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 }
 
@@ -273,25 +273,25 @@ void VescInterface::requestFWVersion(int vesc_id)
   if (master_vesc_id_==vesc_id || vesc_id==0){
     //ROS_INFO("MASTER"); 
      VescPacketRequestFWVersion pay;
-
+/*
      std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
      for(int i=0; i < pay.frame().size(); i++)
          std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
      
      std::cout <<std::endl <<"--------------------------------------"<<std::endl;
-
+*/
 
      send(pay);
   }else{
      //ROS_INFO("FFW");  
      VescPacketCanForwardRequest  pay(vesc_id,VescPacketRequestFWVersion());
-
+/*
      std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
      for(int i=0; i < pay.frame().size(); i++)
          std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
      
      std::cout <<std::endl <<"--------------------------------------"<<std::endl;
-
+*/
      send(pay);
   }
 }
