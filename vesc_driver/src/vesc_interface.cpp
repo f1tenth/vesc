@@ -70,9 +70,13 @@ void VescInterface::Impl::rxThread()
   Buffer buffer;
   buffer.reserve(4096);
 
+  Buffer bufferRx(4096);
+
   while (rx_thread_run_) {
     int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
+    //std::cout << "loop " << bytes_needed <<std::endl;
     if (!buffer.empty()) {
+      //std::cout << "loop buffer not empty" <<std::endl;
       // search buffer for valid packet(s)
       Buffer::iterator iter(buffer.begin());
       Buffer::iterator iter_begin(buffer.begin());
@@ -127,15 +131,26 @@ void VescInterface::Impl::rxThread()
     }
 
     // attempt to read at least bytes_needed bytes from the serial port
-    int bytes_to_read = std::max(bytes_needed, 4096);
+    int bytes_to_read = std::min(bytes_needed, 4096);
 
     {
-      std::lock_guard<std::mutex> lock(serial_mutex_);
+   //   std::lock_guard<std::mutex> lock(serial_mutex_);
+      boost::system::error_code ec;
 
       const size_t bytes_read = boost::asio::read(
         serial_port_,
-        boost::asio::buffer(buffer, buffer.size()),
-        boost::asio::transfer_exactly(bytes_to_read));
+        boost::asio::buffer(bufferRx, bufferRx.capacity()),
+        boost::asio::transfer_exactly(bytes_to_read),
+        ec
+        );
+      
+      std::copy(bufferRx.begin(),bufferRx.begin()+bytes_read, std::back_inserter(buffer));
+/*
+      std::cout << "ec " << ec <<std::endl;
+      std::cout << "failed " << ec.failed() <<std::endl;
+      std::cout << ec.value() <<std::endl;
+      std::cout << ec.category().name() <<std::endl;
+*/
 
       if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
         error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
@@ -203,10 +218,10 @@ void VescInterface::connect(const std::string & port)
         boost::asio::serial_port::stop_bits::one));
   } catch (const std::exception & e) {
     std::stringstream ss;
-    ss << "Failed to open the serial port to the VESC. " << e.what();
+    ss << "Failed to open the serial port "<< port <<" to the VESC. " << e.what();
     throw SerialException(ss.str().c_str());
   }
-
+  
   // start up a monitoring thread
   impl_->rx_thread_run_ = true;
   impl_->rx_thread_ = std::unique_ptr<std::thread>(
@@ -223,21 +238,21 @@ void VescInterface::disconnect()
     impl_->rx_thread_run_ = false;
     impl_->rx_thread_->join();
 
-    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
+    //std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     impl_->serial_port_.close();
   }
 }
 
 bool VescInterface::isConnected() const
 {
-  std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
+  //std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
   return impl_->serial_port_.is_open();
 }
 
 void VescInterface::send(const VescPacket & packet)
 {
   try {
-    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
+    //std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     size_t written = impl_->serial_port_.write_some(
       boost::asio::buffer(packet.frame()));
     if (written != packet.frame().size()) {
@@ -258,25 +273,25 @@ void VescInterface::requestFWVersion(int vesc_id)
   if (master_vesc_id_==vesc_id || vesc_id==0){
     //ROS_INFO("MASTER"); 
      VescPacketRequestFWVersion pay;
-/*
+
      std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
      for(int i=0; i < pay.frame().size(); i++)
          std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
      
      std::cout <<std::endl <<"--------------------------------------"<<std::endl;
-*/
+
 
      send(pay);
   }else{
      //ROS_INFO("FFW");  
      VescPacketCanForwardRequest  pay(vesc_id,VescPacketRequestFWVersion());
-/*
+
      std::cout << "The vector elements are : "<< pay.frame().size() <<std::endl;
      for(int i=0; i < pay.frame().size(); i++)
          std::cout << std::showbase  << std::hex << std::setw(4) << static_cast<int>(pay.frame().at(i)) << " - ";
      
      std::cout <<std::endl <<"--------------------------------------"<<std::endl;
-*/
+
      send(pay);
   }
 }
@@ -354,5 +369,17 @@ void VescInterface::setServo(int vesc_id,double servo)
     send(pay);
   }
 }
+
+void VescInterface::requestImuData(int vesc_id){
+
+  if (master_vesc_id_==vesc_id || vesc_id==0){
+   send(VescPacketRequestImu());
+  } else {
+   VescPacketCanForwardRequest  pay(vesc_id,VescPacketRequestImu());
+    send(pay);
+  }  
+  
+}
+
 
 }  // namespace vesc_driver

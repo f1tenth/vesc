@@ -66,7 +66,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   fw_version_minor_(-1)
 {
   // get vesc serial port address
-  std::string port = declare_parameter<std::string>("port", "");
+  std::string port = declare_parameter<std::string>("port", "/tmp/ttyV0");
 
   // attempt to connect to the serial port
   try {
@@ -144,7 +144,7 @@ void VescDriver::timerCallback()
   } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
     vesc_.requestState(0);
-    //vesc_.requestImuData(0);
+    vesc_.requestImuData(0);
 
   } else {
     // unknown mode, how did that happen?
@@ -243,9 +243,11 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
         "%d command value ",
                       vid);
   }
-
-  RCLCPP_INFO(
-        get_logger(), 
+ auto& clk = *this->get_clock();
+  RCLCPP_INFO_THROTTLE(
+        get_logger(),
+        clk,
+        5000, 
         "%s packet received",packet->name().c_str());
 }
 
