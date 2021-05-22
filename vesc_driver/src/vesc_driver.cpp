@@ -65,7 +65,10 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   fw_version_minor_(-1)
 {
   // get vesc serial port address
-  std::string port = declare_parameter<std::string>("port", "/dev/ttyACM0");
+  // default to /tmp/ttyV0 for debug purpose
+  // use socat /dev/ttyACM0,raw,echo=0  SYSTEM:'tee in.txt |socat - "PTY,link=/tmp/ttyV0,raw,echo=0,waitslave" |tee out.txt'
+  // to sniff comunication data to and from vesc
+  std::string port = declare_parameter<std::string>("port", "/tmp/ttyV0");
 
   // attempt to connect to the serial port
   try {
