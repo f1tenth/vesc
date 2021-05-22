@@ -120,6 +120,19 @@ public:
 
   int fwMajor() const;
   int fwMinor() const;
+
+  std::string    hwname() const;
+  const uint8_t* uuid()  const;
+  bool     paired() const;
+  uint8_t  devVersion() const;
+
+ private:
+  int minor_;
+  int major_;
+  std::string hwname_;
+  bool paired_;
+  uint8_t  uuid_[12];
+  uint8_t  devVersion_;
 };
 
 class VescPacketRequestFWVersion : public VescPacket
@@ -135,25 +148,35 @@ class VescPacketValues : public VescPacket
 public:
   explicit VescPacketValues(std::shared_ptr<VescFrame> raw);
 
-  double v_in() const;
-  double temp_mos1() const;
-  double temp_mos2() const;
-  double temp_mos3() const;
-  double temp_mos4() const;
-  double temp_mos5() const;
-  double temp_mos6() const;
-  double temp_pcb() const;
-  double current_motor() const;
-  double current_in() const;
-  double rpm() const;
-  double duty_now() const;
-  double amp_hours() const;
-  double amp_hours_charged() const;
-  double watt_hours() const;
-  double watt_hours_charged() const;
-  double tachometer() const;
-  double tachometer_abs() const;
-  int fault_code() const;
+double  temp_fet() const;
+double  temp_motor() const;
+double  avg_motor_current() const;
+double  avg_input_current() const;
+double  avg_id() const;
+double  avg_iq() const ;
+double  duty_cycle_now() const;
+double  rpm() const;
+double  duty_now() const;
+double  v_in() const;
+double  amp_hours() const;
+double  amp_hours_charged() const;
+double  watt_hours() const;
+double  watt_hours_charged() const;
+int32_t tachometer() const;
+int32_t tachometer_abs() const;
+int     fault_code() const;
+double  pid_pos_now() const;
+int32_t controller_id() const;
+
+double  temp_mos1() const;
+double  temp_mos2() const;
+double  temp_mos3() const;
+double  avg_vd() const;
+double  avg_vq()  const;
+
+int32_t numVescs() const;
+double  watt_battery_left() const;
+
 };
 
 class VescPacketRequestValues : public VescPacket
@@ -161,7 +184,6 @@ class VescPacketRequestValues : public VescPacket
 public:
   VescPacketRequestValues();
 };
-
 /*------------------------------------------------------------------------------------------------*/
 
 class VescPacketSetDuty : public VescPacket
