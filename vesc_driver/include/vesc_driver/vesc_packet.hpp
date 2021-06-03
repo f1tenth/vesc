@@ -173,9 +173,6 @@ public:
   double  temp_mos3() const;
   double  avg_vd() const;
   double  avg_vq()  const;
-
-  int32_t numVescs() const;
-  double  watt_battery_left() const;
 };
 
 class VescPacketRequestValues : public VescPacket
