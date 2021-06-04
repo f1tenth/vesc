@@ -134,8 +134,6 @@ void VescInterface::Impl::rxThread()
     int bytes_to_read = std::min(bytes_needed, 4096);
 
     {
-      // removed temporarily because it causes a deadlock
-      // std::lock_guard<std::mutex> lock(serial_mutex_);
       boost::system::error_code ec;
 
       const size_t bytes_read = boost::asio::read(
@@ -148,7 +146,7 @@ void VescInterface::Impl::rxThread()
       if (ec.value() > 0) {
         std::ostringstream ss;
 
-        ss << "Serial port comunication error " << ec << ec << std::endl;
+        ss << "Serial port comunication error " << std::endl;
         ss << "failed " << ec.failed() << std::endl;
         ss << ec.value() << std::endl;
         ss << ec.category().name() << std::endl;
@@ -242,8 +240,6 @@ void VescInterface::disconnect()
     // bring down read thread
     impl_->rx_thread_run_ = false;
     impl_->rx_thread_->join();
-
-    // std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     impl_->serial_port_.close();
   }
 }
