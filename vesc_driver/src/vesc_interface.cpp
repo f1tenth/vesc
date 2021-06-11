@@ -130,7 +130,6 @@ void VescInterface::Impl::packet_creation_thread()
       // erase "used" buffer
       buffer_.erase(buffer_.begin(), iter);
     }
-
     buffer_mutex_.unlock();
     // Only attempt to read every 10 ms
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -215,6 +214,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->packet_thread_run_ = false;
+    requestFWVersion();
     impl_->packet_thread_->join();
     impl_->serial_driver_->port()->close();
   }
