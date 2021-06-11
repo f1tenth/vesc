@@ -67,8 +67,12 @@ public:
 
 void VescInterface::Impl::rxThread()
 {
+  // the size varies dynamically and start from 0. capacity is 4096 fixed.
   Buffer buffer;
   buffer.reserve(4096);
+
+  // buffer with fixed size used to read from serial
+  Buffer bufferRx(4096);
 
   while (rx_thread_run_) {
     int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
@@ -127,15 +131,31 @@ void VescInterface::Impl::rxThread()
     }
 
     // attempt to read at least bytes_needed bytes from the serial port
-    int bytes_to_read = std::max(bytes_needed, 4096);
+    int bytes_to_read = std::min(bytes_needed, 4096);
 
     {
-      std::lock_guard<std::mutex> lock(serial_mutex_);
+      boost::system::error_code ec;
 
       const size_t bytes_read = boost::asio::read(
         serial_port_,
-        boost::asio::buffer(buffer, buffer.size()),
-        boost::asio::transfer_exactly(bytes_to_read));
+        boost::asio::buffer(bufferRx, bufferRx.size()),
+        boost::asio::transfer_exactly(bytes_to_read),
+        ec
+      );
+
+      if (ec.value() > 0) {
+        std::ostringstream ss;
+
+        ss << "Serial port comunication error " << std::endl;
+        ss << "failed " << ec.failed() << std::endl;
+        ss << ec.value() << std::endl;
+        ss << ec.category().name() << std::endl;
+        ss << "try to read the bytes received " << std::endl;
+
+        error_handler_(ss.str());
+      }
+
+      std::copy(bufferRx.begin(), bufferRx.begin() + bytes_read, std::back_inserter(buffer));
 
       if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty()) {
         error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
@@ -201,7 +221,7 @@ void VescInterface::connect(const std::string & port)
         boost::asio::serial_port::stop_bits::one));
   } catch (const std::exception & e) {
     std::stringstream ss;
-    ss << "Failed to open the serial port to the VESC. " << e.what();
+    ss << "Failed to open the serial port " << port << " to the VESC. " << e.what();
     throw SerialException(ss.str().c_str());
   }
 
@@ -220,22 +240,20 @@ void VescInterface::disconnect()
     // bring down read thread
     impl_->rx_thread_run_ = false;
     impl_->rx_thread_->join();
-
-    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     impl_->serial_port_.close();
   }
 }
 
 bool VescInterface::isConnected() const
 {
-  std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
+  // std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
   return impl_->serial_port_.is_open();
 }
 
 void VescInterface::send(const VescPacket & packet)
 {
   try {
-    std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
+    // std::lock_guard<std::mutex> lock(impl_->serial_mutex_);
     size_t written = impl_->serial_port_.write_some(
       boost::asio::buffer(packet.frame()));
     if (written != packet.frame().size()) {
