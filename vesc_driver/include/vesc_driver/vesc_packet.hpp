@@ -240,6 +240,68 @@ public:
   //  double servo_pos() const;
 };
 
+/*------------------------------------------------------------------------------------------------*/
+class VescPacketRequestImu : public VescPacket
+{
+public:
+  VescPacketRequestImu();
+};
+
+class VescPacketImu : public VescPacket
+{
+public:
+  explicit VescPacketImu(std::shared_ptr<VescFrame> raw);
+
+  int    mask()  const;
+
+  double yaw()   const;
+  double pitch() const;
+  double roll()  const;
+
+  double acc_x() const;
+  double acc_y() const;
+  double acc_z() const;
+
+  double gyr_x() const;
+  double gyr_y() const;
+  double gyr_z() const;
+
+  double mag_x() const;
+  double mag_y() const;
+  double mag_z() const;
+
+  double q_w() const;
+  double q_x() const;
+  double q_y() const;
+  double q_z() const;
+
+private:
+  double getFloat32Auto(uint32_t * pos) const;
+
+  uint32_t mask_;
+  double roll_;
+  double pitch_;
+  double yaw_;
+
+  double acc_x_;
+  double acc_y_;
+  double acc_z_;
+
+  double gyr_x_;
+  double gyr_y_;
+  double gyr_z_;
+
+  double mag_x_;
+  double mag_y_;
+  double mag_z_;
+
+  double q0_;
+  double q1_;
+  double q2_;
+  double q3_;
+};
+
+/*------------------------------------------------------------------------------------------------*/
 }  // namespace vesc_driver
 
 #endif  // VESC_DRIVER__VESC_PACKET_HPP_
