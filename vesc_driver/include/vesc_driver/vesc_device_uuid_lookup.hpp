@@ -30,43 +30,44 @@ namespace vesc_driver
 
 class VescDeviceLookup
 {
-  public:
-    VescDeviceLookup(std::string device);
+public:
+  explicit VescDeviceLookup(std::string device);
 
-    const char * deviceUUID() const;
-    const char * version() const;
-    const char * hwname() const;
-    void close();
-    bool isReady();
-  private:
-    std::string device_;
-    std::string uuid_;
-    std::string version_;
-    std::string hwname_;
-    std::string error_;
-    bool ready_;
+  const char * deviceUUID() const;
+  const char * version() const;
+  const char * hwname() const;
+  void close();
+  bool isReady();
 
-  private:
-    // interface to the VESC
-    VescInterface vesc_;
-    void vescPacketCallback(const std::shared_ptr<VescPacket const>& packet);
-    void vescErrorCallback(const std::string& error);
-    
-    static std::string decode_uuid(const uint8_t * uuid)
-    {
-      char uuid_data[100] = "";
-      std::string uuid_founded;
-      snprintf(
-        uuid_data, sizeof(uuid_data),
-        "%02x%02x%02x-%02x%02x%02x-%02x%02x%02x-%02x%02x%02x",
-        uuid[0], uuid[1], uuid[2],
-        uuid[3], uuid[4], uuid[5],
-        uuid[6], uuid[7], uuid[8],
-        uuid[9], uuid[10], uuid[11]
-      );
-      return uuid_data;
-    }
-  };
+private:
+  std::string device_;
+  std::string uuid_;
+  std::string version_;
+  std::string hwname_;
+  std::string error_;
+  bool ready_;
+
+private:
+  // interface to the VESC
+  VescInterface vesc_;
+  void vescPacketCallback(const std::shared_ptr<VescPacket const> & packet);
+  void vescErrorCallback(const std::string & error);
+
+  static std::string decode_uuid(const uint8_t * uuid)
+  {
+    char uuid_data[100] = "";
+    std::string uuid_founded;
+    snprintf(
+      uuid_data, sizeof(uuid_data),
+      "%02x%02x%02x-%02x%02x%02x-%02x%02x%02x-%02x%02x%02x",
+      uuid[0], uuid[1], uuid[2],
+      uuid[3], uuid[4], uuid[5],
+      uuid[6], uuid[7], uuid[8],
+      uuid[9], uuid[10], uuid[11]
+    );
+    return uuid_data;
+  }
+};
 }  // namespace vesc_driver
 
 #endif  // VESC_DRIVER__VESC_DEVICE_UUID_LOOKUP_HPP_
