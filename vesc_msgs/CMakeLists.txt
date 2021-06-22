@@ -12,6 +12,7 @@ rosidl_generate_interfaces(vesc_msgs
   DEPENDENCIES
     builtin_interfaces
     std_msgs
+    geometry_msgs
 )
 
 if(BUILD_TESTING)
