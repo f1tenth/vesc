@@ -21,6 +21,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>vesc_msgs</depend>
   <depend>sensors_msgs</depend>
 
