@@ -36,6 +36,8 @@
 #include <std_msgs/msg/float64.hpp>
 #include <vesc_msgs/msg/vesc_state.hpp>
 #include <vesc_msgs/msg/vesc_state_stamped.hpp>
+#include <vesc_msgs/msg/vesc_imu.hpp>
+#include <vesc_msgs/msg/vesc_imu_stamped.hpp>
 
 #include <memory>
 #include <string>
@@ -49,6 +51,7 @@ namespace vesc_driver
 using std_msgs::msg::Float64;
 using vesc_msgs::msg::VescState;
 using vesc_msgs::msg::VescStateStamped;
+using vesc_msgs::msg::VescImuStamped;
 
 class VescDriver
   : public rclcpp::Node
@@ -87,6 +90,7 @@ private:
 
   // ROS services
   rclcpp::Publisher<VescStateStamped>::SharedPtr state_pub_;
+  rclcpp::Publisher<VescImuStamped>::SharedPtr imu_pub_;
   rclcpp::Publisher<Float64>::SharedPtr servo_sensor_pub_;
   rclcpp::SubscriptionBase::SharedPtr duty_cycle_sub_;
   rclcpp::SubscriptionBase::SharedPtr current_sub_;

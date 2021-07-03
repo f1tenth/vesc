@@ -83,6 +83,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
 
   // create vesc state (telemetry) publisher
   state_pub_ = create_publisher<VescStateStamped>("sensors/core", rclcpp::QoS{10});
+  imu_pub_ = create_publisher<VescImuStamped>("sensors/imu", rclcpp::QoS{10});
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
@@ -148,6 +149,8 @@ void VescDriver::timerCallback()
   } else if (driver_mode_ == MODE_OPERATING) {
     // poll for vesc state (telemetry)
     vesc_.requestState();
+    // poll for vesc imu
+    vesc_.requestImuData();
   } else {
     // unknown mode, how did that happen?
     assert(false && "unknown driver mode");
@@ -202,8 +205,37 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
       fw_version->hwname().c_str(),
       fw_version->paired()
     );
-  }
+  } else if (packet->name() == "ImuData") {
+    std::shared_ptr<VescPacketImu const> imuData =
+      std::dynamic_pointer_cast<VescPacketImu const>(packet);
 
+    auto imu_msg = VescImuStamped();
+    imu_msg.header.stamp = now();
+
+    imu_msg.imu.ypr.x = imuData->roll();
+    imu_msg.imu.ypr.y = imuData->pitch();
+    imu_msg.imu.ypr.z = imuData->yaw();
+
+    imu_msg.imu.linear_acceleration.x = imuData->acc_x();
+    imu_msg.imu.linear_acceleration.y = imuData->acc_y();
+    imu_msg.imu.linear_acceleration.z = imuData->acc_z();
+
+    imu_msg.imu.angular_velocity.x = imuData->gyr_x();
+    imu_msg.imu.angular_velocity.y = imuData->gyr_y();
+    imu_msg.imu.angular_velocity.z = imuData->gyr_z();
+
+
+    imu_msg.imu.compass.x = imuData->mag_x();
+    imu_msg.imu.compass.y = imuData->mag_y();
+    imu_msg.imu.compass.z = imuData->mag_z();
+
+    imu_msg.imu.orientation.w = imuData->q_w();
+    imu_msg.imu.orientation.x = imuData->q_x();
+    imu_msg.imu.orientation.y = imuData->q_y();
+    imu_msg.imu.orientation.z = imuData->q_z();
+
+    imu_pub_->publish(imu_msg);
+  }
   auto & clk = *this->get_clock();
   RCLCPP_INFO_THROTTLE(
     get_logger(),

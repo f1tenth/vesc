@@ -7,9 +7,12 @@ ament_auto_find_build_dependencies()
 rosidl_generate_interfaces(vesc_msgs
   "msg/VescState.msg"
   "msg/VescStateStamped.msg"
+  "msg/VescImu.msg"
+  "msg/VescImuStamped.msg"
   DEPENDENCIES
     builtin_interfaces
     std_msgs
+    geometry_msgs
 )
 
 if(BUILD_TESTING)

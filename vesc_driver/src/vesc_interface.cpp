@@ -161,9 +161,8 @@ void VescInterface::Impl::rxThread()
         error_handler_("Possibly out-of-sync with VESC, read timout in the middle of a frame.");
       }
     }
-
     // Only attempt to read every 10 ms
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+//    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
 }
 
@@ -239,6 +238,7 @@ void VescInterface::disconnect()
   if (isConnected()) {
     // bring down read thread
     impl_->rx_thread_run_ = false;
+    requestFWVersion();
     impl_->rx_thread_->join();
     impl_->serial_port_.close();
   }
@@ -306,6 +306,11 @@ void VescInterface::setPosition(double position)
 void VescInterface::setServo(double servo)
 {
   send(VescPacketSetServoPos(servo));
+}
+
+void VescInterface::requestImuData()
+{
+  send(VescPacketRequestImu());
 }
 
 }  // namespace vesc_driver
