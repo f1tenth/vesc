@@ -20,19 +20,19 @@
 #include <iomanip>
 #include <string>
 #include <memory>
-#include <boost/bind.hpp>
+
 #include "vesc_driver/vesc_device_uuid_lookup.hpp"
 
 
 namespace vesc_driver
 {
-
+using std::placeholders::_1;
 
 VescDeviceLookup::VescDeviceLookup(std::string name)
 : vesc_(
     std::string(),
-    boost::bind(&VescDeviceLookup::vescPacketCallback, this, _1),
-    boost::bind(&VescDeviceLookup::vescErrorCallback, this, _1)
+    std::bind(&VescDeviceLookup::vescPacketCallback, this, _1),
+    std::bind(&VescDeviceLookup::vescErrorCallback, this, _1)
 ),
   ready_(false),
   device_(name)
