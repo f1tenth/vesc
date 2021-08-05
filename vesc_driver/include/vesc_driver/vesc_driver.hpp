@@ -38,6 +38,7 @@
 
 #include <memory>
 #include <string>
+#include <optional>
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet.hpp"
