@@ -7,16 +7,16 @@ import os
 def generate_launch_description():
 
     vesc_config = os.path.join(
-        get_package_share_directory('vesc'),
+        get_package_share_directory('vesc_driver'),
         'params',
         'vesc_config.yaml'
         )
     return LaunchDescription([
         Node(
-            package='vesc',
+            package='vesc_driver',
             namespace='vesc',
-            executable='vesc_node',
-            name='vesc_node',
+            executable='vesc_driver_node',
+            name='vesc_driver_node',
             parameters= [vesc_config]           
         ),
 
