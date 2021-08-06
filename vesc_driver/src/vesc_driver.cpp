@@ -266,8 +266,8 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 VescDriver::CommandLimit::CommandLimit(
   rclcpp::Node * node_ptr,
   const std::string & str,
-  const std::optional<double> & min_lower,
-  const std::optional<double> & max_upper)
+  const std::experimental::optional<double> & min_lower,
+  const std::experimental::optional<double> & max_upper)
 : node_ptr(node_ptr),
   logger(node_ptr->get_logger()),
   name(str)
