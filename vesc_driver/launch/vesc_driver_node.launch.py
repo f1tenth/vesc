@@ -14,7 +14,6 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='vesc_driver',
-            namespace='vesc',
             executable='vesc_driver_node',
             name='vesc_driver_node',
             parameters= [vesc_config]           
