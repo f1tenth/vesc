@@ -95,7 +95,6 @@ void VescInterface::Impl::packet_creation_thread()
     if (!buffer_.empty()) {
       // search buffer for valid packet(s)
       auto iter = buffer_.begin();
-      auto iter_begin = buffer_.begin();
       while (iter != buffer_.end())
       {
         // check if valid start-of-frame character
@@ -111,7 +110,6 @@ void VescInterface::Impl::packet_creation_thread()
             packet_handler_(packet);
             // update state
             iter = iter + packet->frame().size();
-            iter_begin = iter;
             // continue to look for another frame in buffer
             continue;
           } else if (bytes_needed > 0) {
