@@ -190,23 +190,7 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     // todo: might need lock here
     fw_version_major_ = fw_version->fwMajor();
     fw_version_minor_ = fw_version->fwMinor();
-
-    RCLCPP_DEBUG(
-      get_logger(),
-      "-=%s=- hardware paired %d",
-      fw_version->hwname().c_str(),
-      fw_version->paired()
-    );
   }
-
-  auto & clk = *this->get_clock();
-  RCLCPP_DEBUG_THROTTLE(
-    get_logger(),
-    clk,
-    5000,
-    "%s packet received",
-    packet->name().c_str()
-  );
 }
 
 void VescDriver::vescErrorCallback(const std::string & error)
