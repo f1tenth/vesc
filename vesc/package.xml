@@ -13,6 +13,7 @@
   <url type="bugtracker">https://github.com/f1tenth/vesc/issues</url>
   <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
   <author email="josh.whitley@autoware.org">Joshua Whitley</author>
+  <author email="hxue@ucsd.edu">Haoru Xue</author>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 

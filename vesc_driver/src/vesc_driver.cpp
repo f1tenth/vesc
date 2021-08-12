@@ -65,12 +65,7 @@ VescDriver::VescDriver(const rclcpp::NodeOptions & options)
   fw_version_minor_(-1)
 {
   // get vesc serial port address
-  /* default to /tmp/ttyV0 for debug purpose
-   * use :
-   *  socat /dev/ttyACM0,raw,echo=0  SYSTEM:'tee in.txt |socat - "PTY,link=/tmp/ttyV0,raw,echo=0,waitslave" |tee out.txt'
-   * to sniff comunication data to and from vesc
-   */
-  std::string port = declare_parameter<std::string>("port", "/tmp/ttyV0");
+  std::string port = declare_parameter<std::string>("port", "");
 
   // attempt to connect to the serial port
   try {
@@ -195,23 +190,7 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     // todo: might need lock here
     fw_version_major_ = fw_version->fwMajor();
     fw_version_minor_ = fw_version->fwMinor();
-
-    RCLCPP_INFO(
-      get_logger(),
-      "-=%s=- hardware paired %d",
-      fw_version->hwname().c_str(),
-      fw_version->paired()
-    );
   }
-
-  auto & clk = *this->get_clock();
-  RCLCPP_INFO_THROTTLE(
-    get_logger(),
-    clk,
-    5000,
-    "%s packet received",
-    packet->name().c_str()
-  );
 }
 
 void VescDriver::vescErrorCallback(const std::string & error)
@@ -299,8 +278,8 @@ void VescDriver::servoCallback(const Float64::SharedPtr servo)
 VescDriver::CommandLimit::CommandLimit(
   rclcpp::Node * node_ptr,
   const std::string & str,
-  const boost::optional<double> & min_lower,
-  const boost::optional<double> & max_upper)
+  const std::experimental::optional<double> & min_lower,
+  const std::experimental::optional<double> & max_upper)
 : node_ptr(node_ptr),
   logger(node_ptr->get_logger()),
   name(str)
