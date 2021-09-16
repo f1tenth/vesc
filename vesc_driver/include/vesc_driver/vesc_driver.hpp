@@ -31,6 +31,7 @@
 #ifndef VESC_DRIVER__VESC_DRIVER_HPP_
 #define VESC_DRIVER__VESC_DRIVER_HPP_
 
+#include <experimental/optional>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -40,10 +41,10 @@
 #include <vesc_msgs/msg/vesc_imu_stamped.hpp>
 #include <memory>
 #include <string>
-#include <experimental/optional>
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet.hpp"
+
 
 namespace vesc_driver
 {
@@ -73,7 +74,8 @@ private:
       rclcpp::Node * node_ptr,
       const std::string & str,
       const std::experimental::optional<double> & min_lower = std::experimental::optional<double>(),
-      const std::experimental::optional<double> & max_upper = std::experimental::optional<double>());
+      const std::experimental::optional<double> & max_upper = std::experimental::optional<double>()
+    );
     double clip(double value);
     rclcpp::Node * node_ptr;
     rclcpp::Logger logger;

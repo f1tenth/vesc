@@ -1,7 +1,8 @@
-from launch import LaunchDescription
-from ament_index_python.packages import get_package_share_directory
-from launch_ros.actions import Node
 import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -16,8 +17,7 @@ def generate_launch_description():
             package='vesc_driver',
             executable='vesc_driver_node',
             name='vesc_driver_node',
-            parameters= [vesc_config]           
+            parameters=[vesc_config]
         ),
 
     ])
-
