@@ -29,9 +29,6 @@
 // -*- mode:c++; fill-column: 100; -*-
 
 #include "vesc_driver/vesc_interface.hpp"
-#include "vesc_driver/vesc_packet_factory.hpp"
-#include "serial_driver/serial_driver.hpp"
-
 
 #include <algorithm>
 #include <cassert>
@@ -42,6 +39,10 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <vector>
+
+#include "vesc_driver/vesc_packet_factory.hpp"
+#include "serial_driver/serial_driver.hpp"
 
 namespace vesc_driver
 {
@@ -51,7 +52,7 @@ class VescInterface::Impl
 public:
   Impl()
   : owned_ctx{new IoContext(2)},
-  serial_driver_{new drivers::serial_driver::SerialDriver(*owned_ctx)}
+    serial_driver_{new drivers::serial_driver::SerialDriver(*owned_ctx)}
   {}
 
   void serial_receive_callback(const std::vector<uint8_t> & buffer);
@@ -68,19 +69,21 @@ public:
   std::string device_name_;
   std::unique_ptr<IoContext> owned_ctx{};
   std::unique_ptr<drivers::serial_driver::SerialDriver> serial_driver_;
-  
-  ~Impl(){
+
+  ~Impl()
+  {
     if (owned_ctx) {
       owned_ctx->waitForExit();
+    }
   }
-  }
+
 private:
   std::vector<uint8_t> buffer_;
 };
 
 void VescInterface::Impl::serial_receive_callback(const std::vector<uint8_t> & buffer)
 {
-  buffer_mutex_.lock(); // wait untill the current buffer read finishes
+  buffer_mutex_.lock();  // wait untill the current buffer read finishes
   buffer_.reserve(buffer_.size() + buffer.size());
   buffer_.insert(buffer_.end(), buffer.begin(), buffer.end());
   buffer_mutex_.unlock();
@@ -88,15 +91,13 @@ void VescInterface::Impl::serial_receive_callback(const std::vector<uint8_t> & b
 
 void VescInterface::Impl::packet_creation_thread()
 {
-  while (packet_thread_run_)
-  {
+  while (packet_thread_run_) {
     buffer_mutex_.lock();
     int bytes_needed = VescFrame::VESC_MIN_FRAME_SIZE;
     if (!buffer_.empty()) {
       // search buffer for valid packet(s)
       auto iter = buffer_.begin();
-      while (iter != buffer_.end())
-      {
+      while (iter != buffer_.end()) {
         // check if valid start-of-frame character
         if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *iter ||
           VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter)
@@ -142,14 +143,14 @@ void VescInterface::Impl::connect(const std::string & port)
   auto fc = drivers::serial_driver::FlowControl::HARDWARE;
   auto pt = drivers::serial_driver::Parity::NONE;
   auto sb = drivers::serial_driver::StopBits::ONE;
-  device_config_ = std::make_unique<drivers::serial_driver::SerialPortConfig>(baud_rate, fc, pt, sb);
+  device_config_ =
+    std::make_unique<drivers::serial_driver::SerialPortConfig>(baud_rate, fc, pt, sb);
   serial_driver_->init_port(port, *device_config_);
   if (!serial_driver_->port()->is_open()) {
     serial_driver_->port()->open();
     serial_driver_->port()->async_receive(
       std::bind(&VescInterface::Impl::serial_receive_callback, this, std::placeholders::_1));
   }
-
 }
 
 VescInterface::VescInterface(
@@ -222,12 +223,9 @@ void VescInterface::disconnect()
 bool VescInterface::isConnected() const
 {
   auto port = impl_->serial_driver_->port();
-  if (port)
-  {
+  if (port) {
     return port->is_open();
-  }
-  else
-  {
+  } else {
     return false;
   }
 }

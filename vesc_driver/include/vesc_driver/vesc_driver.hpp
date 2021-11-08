@@ -36,9 +36,9 @@
 #include <vesc_msgs/msg/vesc_state.hpp>
 #include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
+#include <experimental/optional>
 #include <memory>
 #include <string>
-#include <experimental/optional>
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet.hpp"
@@ -69,7 +69,8 @@ private:
       rclcpp::Node * node_ptr,
       const std::string & str,
       const std::experimental::optional<double> & min_lower = std::experimental::optional<double>(),
-      const std::experimental::optional<double> & max_upper = std::experimental::optional<double>());
+      const std::experimental::optional<double> & max_upper =
+      std::experimental::optional<double>());
     double clip(double value);
     rclcpp::Node * node_ptr;
     rclcpp::Logger logger;
