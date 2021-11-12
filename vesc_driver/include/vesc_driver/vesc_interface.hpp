@@ -116,6 +116,8 @@ public:
 
   void requestFWVersion();
   void requestState();
+  void requestImuData();
+
   void setDutyCycle(double duty_cycle);
   void setCurrent(double current);
   void setBrake(double brake);
