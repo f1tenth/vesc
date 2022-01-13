@@ -249,7 +249,7 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const> & pa
     imu_std_pub_->publish(std_imu_msg);
   }
   auto & clk = *this->get_clock();
-  RCLCPP_INFO_THROTTLE(
+  RCLCPP_DEBUG_THROTTLE(
     get_logger(),
     clk,
     5000,
