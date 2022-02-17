@@ -56,9 +56,9 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
   yaw_(0.0)
 {
   // get ROS parameters
-  declare_parameter("odom_frame", odom_frame_);
-  declare_parameter("base_frame", base_frame_);
-  declare_parameter("use_servo_cmd_to_calc_angular_velocity", use_servo_cmd_);
+  odom_frame_ = declare_parameter("odom_frame", odom_frame_);
+  base_frame_ = declare_parameter("base_frame", base_frame_);
+  use_servo_cmd_ = declare_parameter("use_servo_cmd_to_calc_angular_velocity", use_servo_cmd_);
 
   speed_to_erpm_gain_ = declare_parameter("speed_to_erpm_gain").get<double>();
   speed_to_erpm_offset_ = declare_parameter("speed_to_erpm_offset").get<double>();
@@ -69,7 +69,7 @@ VescToOdom::VescToOdom(const rclcpp::NodeOptions & options)
     wheelbase_ = declare_parameter("wheelbase").get<double>();
   }
 
-  declare_parameter("publish_tf", publish_tf_);
+  publish_tf_ = declare_parameter("publish_tf", publish_tf_);
 
   // create odom publisher
   odom_pub_ = create_publisher<Odometry>("odom", 10);
