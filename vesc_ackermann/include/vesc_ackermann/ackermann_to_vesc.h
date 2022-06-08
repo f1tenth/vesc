@@ -42,7 +42,9 @@ public:
 private:
   // ROS parameters
   // conversion gain and offset
+  bool previous_mode_speed_ = true;
   double speed_to_erpm_gain_, speed_to_erpm_offset_;
+  double accel_to_current_gain_, accel_to_brake_gain_;
   double steering_to_servo_gain_, steering_to_servo_offset_;
 
   /** @todo consider also providing an interpolated look-up table conversion */
@@ -50,6 +52,8 @@ private:
   // ROS services
   ros::Publisher erpm_pub_;
   ros::Publisher servo_pub_;
+  ros::Publisher current_pub_;
+  ros::Publisher brake_pub_;
   ros::Subscriber ackermann_sub_;
 
   // ROS callbacks

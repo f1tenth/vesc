@@ -46,6 +46,10 @@ AckermannToVesc::AckermannToVesc(ros::NodeHandle nh, ros::NodeHandle private_nh)
     return;
   if (!getRequiredParam(nh, "speed_to_erpm_offset", &speed_to_erpm_offset_))
     return;
+  if (!getRequiredParam(nh, "accel_to_current_gain", &accel_to_current_gain_))
+    return;
+  if (!getRequiredParam(nh, "accel_to_brake_gain", &accel_to_brake_gain_))
+    return;
   if (!getRequiredParam(nh, "steering_angle_to_servo_gain", &steering_to_servo_gain_))
     return;
   if (!getRequiredParam(nh, "steering_angle_to_servo_offset", &steering_to_servo_offset_))
@@ -53,6 +57,8 @@ AckermannToVesc::AckermannToVesc(ros::NodeHandle nh, ros::NodeHandle private_nh)
 
   // create publishers to vesc electric-RPM (speed) and servo commands
   erpm_pub_ = nh.advertise<std_msgs::Float64>("commands/motor/speed", 10);
+  current_pub_ = nh.advertise<std_msgs::Float64>("commands/motor/current", 10);
+  brake_pub_ = nh.advertise<std_msgs::Float64>("commands/motor/brake", 10);
   servo_pub_ = nh.advertise<std_msgs::Float64>("commands/servo/position", 10);
 
   // subscribe to ackermann topic
@@ -66,6 +72,19 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   std_msgs::Float64::Ptr erpm_msg(new std_msgs::Float64);
   erpm_msg->data = speed_to_erpm_gain_ * cmd->drive.speed + speed_to_erpm_offset_;
 
+  // calc vesc current/brake (acceleration)
+  bool is_positive_accel = true;
+  std_msgs::Float64::Ptr current_msg(new std_msgs::Float64);
+  std_msgs::Float64::Ptr brake_msg(new std_msgs::Float64);
+  current_msg->data = 0;
+  brake_msg->data = 0;
+  if (cmd->drive.acceleration < 0) {
+    brake_msg->data = accel_to_brake_gain_ * cmd->drive.acceleration;
+    is_positive_accel = false;
+  } else {
+    current_msg->data = accel_to_current_gain_ * cmd->drive.acceleration;
+  }
+
   // calc steering angle (servo)
   std_msgs::Float64::Ptr servo_msg(new std_msgs::Float64);
   servo_msg->data = steering_to_servo_gain_ * cmd->drive.steering_angle + steering_to_servo_offset_;
@@ -73,8 +92,24 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   // publish
   if (ros::ok())
   {
-    erpm_pub_.publish(erpm_msg);
+    // The below code attempts to stick to the previous mode until a new message forces a mode switch.
+    if (erpm_msg->data != 0 || previous_mode_speed_) {
+      erpm_pub_.publish(erpm_msg);
+    } else {
+      if (is_positive_accel) {
+        current_pub_.publish(current_msg);
+      } else {
+        brake_pub_.publish(brake_msg);
+      }
+    }
     servo_pub_.publish(servo_msg);
+  }
+
+  // The lines below are to determine which mode we are in so we can hold until new messages force a switch.
+  if (erpm_msg->data != 0) {
+    previous_mode_speed_ = true;
+  } else if (current_msg->data != 0 || brake_msg->data != 0) {
+    previous_mode_speed_ = false;
   }
 }
 
