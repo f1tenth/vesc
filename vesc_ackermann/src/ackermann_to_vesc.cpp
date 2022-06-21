@@ -78,10 +78,13 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   std_msgs::Float64::Ptr brake_msg(new std_msgs::Float64);
   current_msg->data = 0;
   brake_msg->data = 0;
-  if (cmd->drive.acceleration < 0) {
+  if (cmd->drive.acceleration < 0)
+  {
     brake_msg->data = accel_to_brake_gain_ * cmd->drive.acceleration;
     is_positive_accel = false;
-  } else {
+  }
+  else
+  {
     current_msg->data = accel_to_current_gain_ * cmd->drive.acceleration;
   }
 
@@ -93,12 +96,18 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   if (ros::ok())
   {
     // The below code attempts to stick to the previous mode until a new message forces a mode switch.
-    if (erpm_msg->data != 0 || previous_mode_speed_) {
+    if (erpm_msg->data != 0 || previous_mode_speed_)
+    {
       erpm_pub_.publish(erpm_msg);
-    } else {
-      if (is_positive_accel) {
+    }
+    else
+    {
+      if (is_positive_accel)
+      {
         current_pub_.publish(current_msg);
-      } else {
+      }
+      else
+      {
         brake_pub_.publish(brake_msg);
       }
     }
@@ -106,9 +115,12 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   }
 
   // The lines below are to determine which mode we are in so we can hold until new messages force a switch.
-  if (erpm_msg->data != 0) {
+  if (erpm_msg->data != 0)
+  {
     previous_mode_speed_ = true;
-  } else if (current_msg->data != 0 || brake_msg->data != 0) {
+  }
+  else if (current_msg->data != 0 || brake_msg->data != 0)
+  {
     previous_mode_speed_ = false;
   }
 }
