@@ -190,7 +190,7 @@ void VescDriver::vescErrorCallback(const std::string& error)
  */
 void VescDriver::dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
   }
@@ -203,7 +203,7 @@ void VescDriver::dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle
  */
 void VescDriver::currentCallback(const std_msgs::Float64::ConstPtr& current)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     vesc_.setCurrent(current_limit_.clip(current->data));
   }
@@ -216,7 +216,7 @@ void VescDriver::currentCallback(const std_msgs::Float64::ConstPtr& current)
  */
 void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     vesc_.setBrake(brake_limit_.clip(brake->data));
   }
@@ -230,7 +230,7 @@ void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
  */
 void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     vesc_.setSpeed(speed_limit_.clip(speed->data));
   }
@@ -242,7 +242,7 @@ void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
  */
 void VescDriver::positionCallback(const std_msgs::Float64::ConstPtr& position)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     // ROS uses radians but VESC seems to use degrees. Convert to degrees.
     double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
@@ -255,7 +255,7 @@ void VescDriver::positionCallback(const std_msgs::Float64::ConstPtr& position)
  */
 void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
 {
-  if (driver_mode_ = MODE_OPERATING)
+  if (driver_mode_ == MODE_OPERATING)
   {
     double servo_clipped(servo_limit_.clip(servo->data));
     vesc_.setServo(servo_clipped);
