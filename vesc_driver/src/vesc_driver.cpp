@@ -270,7 +270,7 @@ void VescDriver::vescErrorCallback(const std::string & error)
  */
 void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
   }
 }
@@ -282,7 +282,7 @@ void VescDriver::dutyCycleCallback(const Float64::SharedPtr duty_cycle)
  */
 void VescDriver::currentCallback(const Float64::SharedPtr current)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     vesc_.setCurrent(current_limit_.clip(current->data));
   }
 }
@@ -294,7 +294,7 @@ void VescDriver::currentCallback(const Float64::SharedPtr current)
  */
 void VescDriver::brakeCallback(const Float64::SharedPtr brake)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     vesc_.setBrake(brake_limit_.clip(brake->data));
   }
 }
@@ -307,7 +307,7 @@ void VescDriver::brakeCallback(const Float64::SharedPtr brake)
  */
 void VescDriver::speedCallback(const Float64::SharedPtr speed)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     vesc_.setSpeed(speed_limit_.clip(speed->data));
   }
 }
@@ -318,7 +318,7 @@ void VescDriver::speedCallback(const Float64::SharedPtr speed)
  */
 void VescDriver::positionCallback(const Float64::SharedPtr position)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     // ROS uses radians but VESC seems to use degrees. Convert to degrees.
     double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
     vesc_.setPosition(position_deg);
@@ -330,7 +330,7 @@ void VescDriver::positionCallback(const Float64::SharedPtr position)
  */
 void VescDriver::servoCallback(const Float64::SharedPtr servo)
 {
-  if (driver_mode_ = MODE_OPERATING) {
+  if (driver_mode_ == MODE_OPERATING) {
     double servo_clipped(servo_limit_.clip(servo->data));
     vesc_.setServo(servo_clipped);
     // publish clipped servo value as a "sensor"
