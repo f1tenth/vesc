@@ -11,9 +11,19 @@ on:
 jobs:
 
   build-ros2:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+          ros_distro: "humble"
+        }
+        - {
+          ros_distro: "foxy"
+        }
     runs-on: ubuntu-latest
     container:
-      image: ros:foxy
+      image: ros:${{ matrix.config.ros_distro }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
