@@ -2,6 +2,15 @@
 Changelog for package vesc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#14 <https://github.com/f1tenth/vesc/issues/14>`_ from Triton-AI/ros2
+  Pull ros2 experimental vesc driver back into f1tenth
+* std::optional -> std::experimental::optional
+* force c++17
+* Porting vesc meta-package to ROS2.
+* Contributors: Haoru Xue, Joshua Whitley
+
 1.1.0 (2020-12-12)
 ------------------
 * Merge pull request `#1 <https://github.com/f1tenth/vesc/issues/1>`_ from f1tenth/melodic-devel
