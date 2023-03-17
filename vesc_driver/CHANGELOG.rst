@@ -2,8 +2,8 @@
 Changelog for package vesc_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2023-03-17)
+------------------
 * Expose VESC config from VESC driver launch file.
 * Fix issue with if statements.
 * Merge pull request `#20 <https://github.com/f1tenth/vesc/issues/20>`_ from Triton-AI/ros2

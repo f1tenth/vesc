@@ -2,8 +2,8 @@
 Changelog for package vesc_ackermann
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2023-03-17)
+------------------
 * Merge pull request `#21 <https://github.com/f1tenth/vesc/issues/21>`_ from Triton-AI/ros2
   Debug vesc_to_odom TF not publishing
 * Merge pull request `#18 <https://github.com/f1tenth/vesc/issues/18>`_ from jacobjj/ros2_correction

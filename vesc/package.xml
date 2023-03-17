@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>vesc</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <description>
     Metapackage for ROS interface to the Vedder VESC open source motor controller.
   </description>

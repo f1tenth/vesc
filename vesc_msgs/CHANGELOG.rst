@@ -2,8 +2,8 @@
 Changelog for package vesc_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2023-03-17)
+------------------
 * Merge pull request `#19 <https://github.com/f1tenth/vesc/issues/19>`_ from anscipione/add_imu_support_rebase_v2
   Add imu support and vesc udev enumeration tools (rebase upstream ros2) v2
 * fixed timing wait for imu polling

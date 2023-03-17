@@ -2,8 +2,8 @@
 Changelog for package vesc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.0 (2023-03-17)
+------------------
 * Merge pull request `#14 <https://github.com/f1tenth/vesc/issues/14>`_ from Triton-AI/ros2
   Pull ros2 experimental vesc driver back into f1tenth
 * std::optional -> std::experimental::optional
