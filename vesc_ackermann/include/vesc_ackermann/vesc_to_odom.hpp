@@ -31,14 +31,15 @@
 #ifndef VESC_ACKERMANN__VESC_TO_ODOM_HPP_
 #define VESC_ACKERMANN__VESC_TO_ODOM_HPP_
 
-#include <nav_msgs/msg/odometry.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/float64.hpp>
 #include <tf2_ros/transform_broadcaster.h>
-#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 #include <memory>
 #include <string>
+
+#include <nav_msgs/msg/odometry.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/float64.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 namespace vesc_ackermann
 {

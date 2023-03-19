@@ -30,11 +30,11 @@
 
 #include "vesc_ackermann/vesc_to_odom.hpp"
 
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <vesc_msgs/msg/vesc_state_stamped.hpp>
-
 #include <cmath>
 #include <string>
+
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <vesc_msgs/msg/vesc_state_stamped.hpp>
 
 namespace vesc_ackermann
 {

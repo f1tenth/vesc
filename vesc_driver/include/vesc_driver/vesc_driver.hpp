@@ -31,6 +31,10 @@
 #ifndef VESC_DRIVER__VESC_DRIVER_HPP_
 #define VESC_DRIVER__VESC_DRIVER_HPP_
 
+#include <experimental/optional>
+#include <memory>
+#include <string>
+
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -38,9 +42,6 @@
 #include <vesc_msgs/msg/vesc_state_stamped.hpp>
 #include <vesc_msgs/msg/vesc_imu.hpp>
 #include <vesc_msgs/msg/vesc_imu_stamped.hpp>
-#include <experimental/optional>
-#include <memory>
-#include <string>
 
 #include "vesc_driver/vesc_interface.hpp"
 #include "vesc_driver/vesc_packet.hpp"
