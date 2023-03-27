@@ -576,7 +576,7 @@ double VescPacketImu::getFloat32Auto(uint32_t * idx) const
 
   int e = (res >> 23) & 0xFF;
   int fr = res & 0x7FFFFF;
-  bool negative = res & (1 << 31);
+  bool negative = res & (1u << 31);
 
   float f = 0.0;
   if (e != 0 || fr != 0) {

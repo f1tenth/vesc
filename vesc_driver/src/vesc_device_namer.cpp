@@ -16,9 +16,11 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <vesc_driver/vesc_device_uuid_lookup.hpp>
-#include <string>
+
 #include <iostream>
+#include <string>
+
+#include <vesc_driver/vesc_device_uuid_lookup.hpp>
 
 int main(int argc, char ** argv)
 {

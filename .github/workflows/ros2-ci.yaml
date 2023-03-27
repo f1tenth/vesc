@@ -18,9 +18,6 @@ jobs:
         - {
           ros_distro: "humble"
         }
-        - {
-          ros_distro: "foxy"
-        }
     runs-on: ubuntu-latest
     container:
       image: ros:${{ matrix.config.ros_distro }}
