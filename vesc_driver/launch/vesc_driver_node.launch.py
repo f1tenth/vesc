@@ -37,22 +37,43 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    vesc_config = os.path.join(
+    # Get default config file.
+    config = os.path.join(
         get_package_share_directory('vesc_driver'),
         'params',
-        'vesc_config.yaml'
+        'config.yaml'
         )
-    return LaunchDescription([
-        DeclareLaunchArgument(
+
+    # Create the launch configuration variables
+    config_yaml = LaunchConfiguration("config")
+    log_level = LaunchConfiguration('log_level')
+
+    declare_log_level_cmd = DeclareLaunchArgument(
+        'log_level', default_value='info',
+        description='log level')
+
+    declare_config_yaml_cmd = DeclareLaunchArgument(
             name="config",
-            default_value=vesc_config,
-            description="VESC yaml configuration file.",
-            ),
-        Node(
+            default_value=config,
+            description="Vesc driver configuration file.",
+            )
+
+    start_vesc_driver_cmd = Node(
             package='vesc_driver',
             executable='vesc_driver_node',
             name='vesc_driver_node',
-            parameters=[LaunchConfiguration("config")]
-        ),
+            parameters=[config_yaml],
+            arguments=['--ros-args', '--log-level', log_level],
+        )
 
-    ])
+    # Create the launch description and populate
+    ld = LaunchDescription()
+
+    # Declare the launch options
+    ld.add_action(declare_config_yaml_cmd)
+    ld.add_action(declare_log_level_cmd)
+
+    # Add the action to launch the node
+    ld.add_action(start_vesc_driver_cmd)
+
+    return ld
