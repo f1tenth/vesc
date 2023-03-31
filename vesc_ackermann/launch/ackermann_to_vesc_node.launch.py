@@ -38,10 +38,10 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     # Get default config file.
-    config = os.path.join(
-        get_package_share_directory('vesc_driver'),
+    vesc_ackermann_config = os.path.join(
+        get_package_share_directory('vesc_ackermann'),
         'params',
-        'config.yaml'
+        'ackermann_to_vesc_config.yaml'
         )
 
     # Create the launch configuration variables
@@ -54,14 +54,15 @@ def generate_launch_description():
 
     declare_config_yaml_cmd = DeclareLaunchArgument(
             name="config",
-            default_value=config,
-            description="Vesc driver configuration file.",
+            default_value=vesc_ackermann_config,
+            description="Ackermann to vesc configuration file.",
             )
 
-    start_vesc_driver_cmd = Node(
-            package='vesc_driver',
-            executable='vesc_driver_node',
-            name='vesc_driver_node',
+    # Specify the actions
+    start_vesc_ackermann_cmd = Node(
+            package='vesc_ackermann',
+            executable='ackermann_to_vesc_node',
+            name='ackermann_to_vesc_node',
             parameters=[config_yaml],
             arguments=['--ros-args', '--log-level', log_level],
         )
@@ -74,6 +75,6 @@ def generate_launch_description():
     ld.add_action(declare_log_level_cmd)
 
     # Add the action to launch the node
-    ld.add_action(start_vesc_driver_cmd)
+    ld.add_action(start_vesc_ackermann_cmd)
 
     return ld
