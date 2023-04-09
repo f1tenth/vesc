@@ -1,0 +1,11 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+
+  <rosparam file="src/vesc/vesc.yaml" command="load" />
+
+  <node pkg="car_software" type="get_inst_ack_cmd_from_mpc_profile.py" name="get_inst_ack_cmd_from_mpc_profile" > </node>
+  <node pkg="vesc_ackermann" type="ackermann_to_vesc_node" name="ackermann_to_vesc" output = "screen"> </node>
+  <node pkg="vesc_driver" type="vesc_driver_node" name="vesc_driver" output = "screen" />
+  <node pkg="vesc_ackermann" type="vesc_to_odom_node" name="vesc_to_odom" output = "screen" />
+
+</launch>
