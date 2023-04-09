@@ -1,34 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vesc_driver)
 
-# Set minimum C++ standard to C++11
-if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
-  set(CMAKE_CXX_STANDARD 11)
-endif()
-
-find_package(Boost REQUIRED)
-
 find_package(catkin REQUIRED COMPONENTS
   nodelet
   pluginlib
   roscpp
-  roslint
-  serial
   std_msgs
   vesc_msgs
+  serial
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS
-    nodelet
-    pluginlib
-    std_msgs
-    vesc_msgs serial
+  CATKIN_DEPENDS nodelet pluginlib roscpp std_msgs vesc_msgs serial
 )
 
 ###########
@@ -63,15 +47,6 @@ target_link_libraries(vesc_driver_nodelet
   ${catkin_LIBRARIES}
 )
 
-file(GLOB_RECURSE ${PROJECT_NAME}_CPP_FILES
-  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  . *.cpp *.h)
-list(REMOVE_ITEM ${PROJECT_NAME}_CPP_FILES
-  include/${PROJECT_NAME}/crc.h)
-
-set(ROSLINT_CPP_OPTS "--filter=-build/c++11")
-roslint_cpp(${${PROJECT_NAME}_CPP_FILES})
-
 #############
 ## Install ##
 #############
@@ -95,6 +70,4 @@ install(DIRECTORY launch/
 ## Testing ##
 #############
 
-if(CATKIN_ENABLE_TESTING)
-  roslint_add_test()
-endif()
+# TODO

@@ -1,39 +1,17 @@
-// Copyright 2020 F1TENTH Foundation
-//
-// Redistribution and use in source and binary forms, with or without modification, are permitted
-// provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this list of conditions
-//    and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other materials
-//    provided with the distribution.
-//
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used
-//    to endorse or promote products derived from this software without specific prior
-//    written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
-// WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 // -*- mode:c++; fill-column: 100; -*-
 
 #ifndef VESC_DRIVER_VESC_INTERFACE_H_
 #define VESC_DRIVER_VESC_INTERFACE_H_
 
-#include <exception>
-#include <functional>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
 #include <string>
+#include <sstream>
+#include <exception>
+#include <stdexcept>
+
+#include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -43,11 +21,12 @@ namespace vesc_driver
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface
+class VescInterface : private boost::noncopyable
 {
 public:
-  typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef std::function<void (const std::string&)> ErrorHandlerFunction;
+
+  typedef boost::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
+  typedef boost::function<void (const std::string&)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not
@@ -63,12 +42,6 @@ public:
   VescInterface(const std::string& port = std::string(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
-
-  /**
-   * Delete copy constructor and equals operator.
-   */
-  VescInterface(const VescInterface &) = delete;
-  VescInterface & operator=(const VescInterface &) = delete;
 
   /**
    * VescInterface destructor.
@@ -119,10 +92,13 @@ public:
   void setPosition(double position);
   void setServo(double servo);
 
+  void requestImuData();
+
+
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
-  std::unique_ptr<Impl> impl_;
+  boost::scoped_ptr<Impl> impl_;
 };
 
 // todo: review
@@ -132,20 +108,18 @@ class SerialException : public std::exception
   SerialException& operator=(const SerialException&);
   std::string e_what_;
 public:
-  explicit SerialException(const char *description)
-  {
-    std::stringstream ss;
-    ss << "SerialException " << description << " failed.";
-    e_what_ = ss.str();
+  SerialException (const char *description) {
+      std::stringstream ss;
+      ss << "SerialException " << description << " failed.";
+      e_what_ = ss.str();
   }
-  SerialException(const SerialException& other) : e_what_(other.e_what_) {}
+  SerialException (const SerialException& other) : e_what_(other.e_what_) {}
   virtual ~SerialException() throw() {}
-  virtual const char* what() const throw()
-  {
+  virtual const char* what () const throw () {
     return e_what_.c_str();
   }
 };
 
-}  // namespace vesc_driver
+} // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_INTERFACE_H_
+#endif // VESC_DRIVER_VESC_INTERFACE_H_

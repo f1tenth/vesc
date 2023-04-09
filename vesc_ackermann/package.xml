@@ -1,34 +1,43 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-<package format="3">
+<package>
   <name>vesc_ackermann</name>
-  <version>1.1.0</version>
+  <version>0.0.1</version>
   <description>
     Translate between VESC messages and ROS ackermann and odometry messages.
   </description>
-  <maintainer email="joebetz@seas.upenn.edu">Johannes Betz</maintainer>
-  <license>BSD</license>
-  <url type="website">http://www.ros.org/wiki/vesc_ackermann</url>
-  <url type="repository">https://github.com/f1tenth/vesc</url>
-  <url type="bugtracker">https://github.com/f1tenth/vesc/issues</url>
+
+  <maintainer email="boulet@ll.mit.edu">Michael T. Boulet</maintainer>
   <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
-  <author email="josh.whitley@autoware.org">Joshua Whitley</author>
+  <license>BSD</license>
+
+  <url type="website">http://www.ros.org/wiki/vesc_ackermann</url>
+  <url type="repository">https://github.mit.edu/racecar/racecar-iap</url>
+  <url type="bugtracker">https://github.mit.edu/racecar/racecar-iap/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roslint</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>ackermann_msgs</build_depend>
+  <build_depend>vesc_msgs</build_depend>
 
-  <depend>ackermann_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>nav_msgs</depend>
-  <depend>nodelet</depend>
-  <depend>pluginlib</depend>
-  <depend>roscpp</depend>
-  <depend>std_msgs</depend>
-  <depend>tf</depend>
-  <depend>vesc_msgs</depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>ackermann_msgs</run_depend>
+  <run_depend>vesc_msgs</run_depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_ackermann_nodelet.xml"/>
   </export>
+
 </package>

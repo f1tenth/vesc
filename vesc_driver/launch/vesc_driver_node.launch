@@ -17,4 +17,17 @@
     <param name="port" value="$(arg port)" />
   </node>
 
+  <!-- Madgwick IMU Filter nodes -->
+ <node pkg="nodelet" type="nodelet" name="imu_manager"
+    args="manager" output="screen" />
+
+  <node pkg="nodelet" type="nodelet" name="ImuFilterNodelet"
+    args="load imu_filter_madgwick/ImuFilterNodelet imu_manager"
+    output="screen">
+    <remap from="imu/data_raw" to="/imu/raw"/>
+    <remap from="imu/data" to="imu/filtered/data"/>
+    <param name="publish_tf" value="false"/>
+
+  </node>
+
 </launch>

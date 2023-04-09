@@ -1,40 +1,17 @@
-// Copyright 2020 F1TENTH Foundation
-//
-// Redistribution and use in source and binary forms, with or without modification, are permitted
-// provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this list of conditions
-//    and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list
-//    of conditions and the following disclaimer in the documentation and/or other materials
-//    provided with the distribution.
-//
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used
-//    to endorse or promote products derived from this software without specific prior
-//    written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
-// WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 // -*- mode:c++; fill-column: 100; -*-
 
 #ifndef VESC_DRIVER_VESC_PACKET_FACTORY_H_
 #define VESC_DRIVER_VESC_PACKET_FACTORY_H_
 
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
 #include <vector>
+#include <map>
+#include <string>
 
+#include <boost/noncopyable.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include "vesc_driver/v8stdint.h"
 #include "vesc_driver/vesc_packet.h"
 
 namespace vesc_driver
@@ -43,7 +20,7 @@ namespace vesc_driver
 /**
  * Class for creating VESC packets from raw data.
  */
-class VescPacketFactory
+class VescPacketFactory : private boost::noncopyable
 {
 public:
   /** Return the global factory object */
@@ -73,42 +50,33 @@ public:
                                     const Buffer::const_iterator& end,
                                     int* num_bytes_needed, std::string* what);
 
-  typedef std::function<VescPacketPtr(std::shared_ptr<VescFrame>)> CreateFn;
+  typedef boost::function<VescPacketPtr(boost::shared_ptr<VescFrame>)> CreateFn;
 
   /** Register a packet type with the factory. */
   static void registerPacketType(int payload_id, CreateFn fn);
 
-  /**
-   * Delete copy constructor and equals operator.
-   */
-  VescPacketFactory(const VescPacketFactory &) = delete;
-  VescPacketFactory & operator=(const VescPacketFactory &) = delete;
-
 private:
-  VescPacketFactory();
+
   typedef std::map<int, CreateFn > FactoryMap;
   static FactoryMap* getMap();
 };
 
-template<typename PACKETTYPE>
-class PacketFactoryTemplate
-{
-public:
-  explicit PacketFactoryTemplate(int payload_id)
-  {
-    VescPacketFactory::registerPacketType(payload_id, &PacketFactoryTemplate::create);
-  }
-
-  static VescPacketPtr create(std::shared_ptr<VescFrame> frame)
-  {
-    return VescPacketPtr(new PACKETTYPE(frame));
-  }
-};
-
 /** Use this macro to register packets */
-#define REGISTER_PACKET_TYPE(id, klass) \
-static PacketFactoryTemplate<klass> global_##klass##Factory((id));
+#define REGISTER_PACKET_TYPE(id, klass)   \
+class klass##Factory \
+{ \
+public: \
+  klass##Factory() \
+  { \
+    VescPacketFactory::registerPacketType((id), &klass##Factory::create); \
+  } \
+  static VescPacketPtr create(boost::shared_ptr<VescFrame> frame) \
+  { \
+    return VescPacketPtr(new klass(frame)); \
+  } \
+}; \
+static klass##Factory global_##klass##Factory;
 
-}  // namespace vesc_driver
+} // namespace vesc_driver
 
-#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif // VESC_DRIVER_VESC_PACKET_FACTORY_H_
