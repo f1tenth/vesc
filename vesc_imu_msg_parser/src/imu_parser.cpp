@@ -17,6 +17,9 @@ void ImuParser::imuDataCallback(const vesc_msgs::VescImuStamped& imu_msg)
   auto parsed_imu_msg = new sensor_msgs::Imu();
   auto parsed_imu_mag_msg = new sensor_msgs::MagneticField();
 
+  // parsed_imu_msg->header.frame_id = "imu";
+  // parsed_imu_mag_msg->header.frame_id = "imu";
+
   // imu data message
   parsed_imu_mag_msg->header.stamp = ros::Time::now();
   parsed_imu_msg->header.stamp = ros::Time::now();
@@ -53,7 +56,7 @@ int main(int argc, char** argv)
 
   vesc_imu_parser::ImuParser obj = vesc_imu_parser::ImuParser(n);
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(60);
 
   while (ros::ok())
   {
