@@ -1,0 +1,19 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+    
+  <node pkg="vesc_imu_msg_parser" type="vesc_imu_msg_parser_node" name="vesc_imu_parser_node" output = "screen"/>
+  
+  <!-- Madgwick IMU Filter nodes -->
+ <node pkg="nodelet" type="nodelet" name="imu_manager"
+    args="manager" output="screen" />
+
+  <node pkg="nodelet" type="nodelet" name="ImuFilterNodelet"
+    args="load imu_filter_madgwick/ImuFilterNodelet imu_manager"
+    output="screen">
+    <!-- <remap from="imu/data_raw" to="/sensors/imu"/> -->
+    <!-- <remap from="imu/data" to="imu/filtered/data"/> -->
+    <param name="publish_tf" value="false"/>
+
+  </node>
+
+</launch>
