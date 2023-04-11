@@ -12,7 +12,6 @@ namespace vesc_ackermann
 class AckermannToVesc
 {
 public:
-
   AckermannToVesc(ros::NodeHandle nh, ros::NodeHandle private_nh);
 
 private:
@@ -32,6 +31,6 @@ private:
   void ackermannCmdCallback(const ackermann_msgs::AckermannDriveStamped::ConstPtr& cmd);
 };
 
-} // namespace vesc_ackermann
+}  // namespace vesc_ackermann
 
-#endif // VESC_ACKERMANN_ACKERMANN_TO_VESC_H_
+#endif  // VESC_ACKERMANN_ACKERMANN_TO_VESC_H_

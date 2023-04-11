@@ -20,93 +20,96 @@
 #ifndef DATATYPES_H
 #define DATATYPES_H
 
-//#include <QObject>
-//#include <QString>
-//#include <QStringList>
-//#include <QVector>
+// #include <QObject>
+// #include <QString>
+// #include <QStringList>
+// #include <QVector>
 #include <stdint.h>
 
-typedef struct {
-    bool isVesc;
+typedef struct
+{
+  bool isVesc;
 } VSerialInfo_t;
 
-typedef enum {
-    CFG_T_UNDEFINED = 0,
-    CFG_T_DOUBLE,
-    CFG_T_INT,
-    CFG_T_QSTRING,
-    CFG_T_ENUM,
-    CFG_T_BOOL
+typedef enum
+{
+  CFG_T_UNDEFINED = 0,
+  CFG_T_DOUBLE,
+  CFG_T_INT,
+  CFG_T_QSTRING,
+  CFG_T_ENUM,
+  CFG_T_BOOL
 } CFG_T;
 
-typedef enum {
-    VESC_TX_UNDEFINED = 0,
-    VESC_TX_UINT8,
-    VESC_TX_INT8,
-    VESC_TX_UINT16,
-    VESC_TX_INT16,
-    VESC_TX_UINT32,
-    VESC_TX_INT32,
-    VESC_TX_DOUBLE16,
-    VESC_TX_DOUBLE32,
-    VESC_TX_DOUBLE32_AUTO
+typedef enum
+{
+  VESC_TX_UNDEFINED = 0,
+  VESC_TX_UINT8,
+  VESC_TX_INT8,
+  VESC_TX_UINT16,
+  VESC_TX_INT16,
+  VESC_TX_UINT32,
+  VESC_TX_INT32,
+  VESC_TX_DOUBLE16,
+  VESC_TX_DOUBLE32,
+  VESC_TX_DOUBLE32_AUTO
 } VESC_TX_T;
 
-typedef enum {
-    FAULT_CODE_NONE = 0,
-    FAULT_CODE_OVER_VOLTAGE,
-    FAULT_CODE_UNDER_VOLTAGE,
-    FAULT_CODE_DRV,
-    FAULT_CODE_ABS_OVER_CURRENT,
-    FAULT_CODE_OVER_TEMP_FET,
-    FAULT_CODE_OVER_TEMP_MOTOR
+typedef enum
+{
+  FAULT_CODE_NONE = 0,
+  FAULT_CODE_OVER_VOLTAGE,
+  FAULT_CODE_UNDER_VOLTAGE,
+  FAULT_CODE_DRV,
+  FAULT_CODE_ABS_OVER_CURRENT,
+  FAULT_CODE_OVER_TEMP_FET,
+  FAULT_CODE_OVER_TEMP_MOTOR
 } mc_fault_code;
 
-typedef enum {
-    DISP_POS_MODE_NONE = 0,
-    DISP_POS_MODE_INDUCTANCE,
-    DISP_POS_MODE_OBSERVER,
-    DISP_POS_MODE_ENCODER,
-    DISP_POS_MODE_PID_POS,
-    DISP_POS_MODE_PID_POS_ERROR,
-    DISP_POS_MODE_ENCODER_OBSERVER_ERROR
+typedef enum
+{
+  DISP_POS_MODE_NONE = 0,
+  DISP_POS_MODE_INDUCTANCE,
+  DISP_POS_MODE_OBSERVER,
+  DISP_POS_MODE_ENCODER,
+  DISP_POS_MODE_PID_POS,
+  DISP_POS_MODE_PID_POS_ERROR,
+  DISP_POS_MODE_ENCODER_OBSERVER_ERROR
 } disp_pos_mode;
 
-struct MC_VALUES {
-
+struct MC_VALUES
+{
 public:
-    double v_in;
-    double temp_mos;
-    double temp_motor;
-    double current_motor;
-    double current_in;
-    double id;
-    double iq;
-    double rpm;
-    double duty_now;
-    double amp_hours;
-    double amp_hours_charged;
-    double watt_hours;
-    double watt_hours_charged;
-    int tachometer;
-    int tachometer_abs;
-    double position;
-    mc_fault_code fault_code;
+  double v_in;
+  double temp_mos;
+  double temp_motor;
+  double current_motor;
+  double current_in;
+  double id;
+  double iq;
+  double rpm;
+  double duty_now;
+  double amp_hours;
+  double amp_hours_charged;
+  double watt_hours;
+  double watt_hours_charged;
+  int tachometer;
+  int tachometer_abs;
+  double position;
+  mc_fault_code fault_code;
 };
 
-
-
-typedef enum {
-    DEBUG_SAMPLING_OFF = 0,
-    DEBUG_SAMPLING_NOW,
-    DEBUG_SAMPLING_START,
-    DEBUG_SAMPLING_TRIGGER_START,
-    DEBUG_SAMPLING_TRIGGER_FAULT,
-    DEBUG_SAMPLING_TRIGGER_START_NOSEND,
-    DEBUG_SAMPLING_TRIGGER_FAULT_NOSEND,
-    DEBUG_SAMPLING_SEND_LAST_SAMPLES
+typedef enum
+{
+  DEBUG_SAMPLING_OFF = 0,
+  DEBUG_SAMPLING_NOW,
+  DEBUG_SAMPLING_START,
+  DEBUG_SAMPLING_TRIGGER_START,
+  DEBUG_SAMPLING_TRIGGER_FAULT,
+  DEBUG_SAMPLING_TRIGGER_START_NOSEND,
+  DEBUG_SAMPLING_TRIGGER_FAULT_NOSEND,
+  DEBUG_SAMPLING_SEND_LAST_SAMPLES
 } debug_sampling_mode;
-
 
 // Communication commands
 typedef enum
@@ -204,7 +207,6 @@ typedef enum
   COMM_GET_IMU_CALIBRATION
 } COMM_PACKET_ID;
 
-
 // typedef enum {
 //     COMM_FW_VERSION = 0,
 //     COMM_JUMP_TO_BOOTLOADER,
@@ -247,31 +249,30 @@ typedef enum
 //     COMM_GET_IMU_DATA
 // } COMM_PACKET_ID;
 
-typedef struct {
-    int js_x;
-    int js_y;
-    int acc_x;
-    int acc_y;
-    int acc_z;
-    bool bt_c;
-    bool bt_z;
+typedef struct
+{
+  int js_x;
+  int js_y;
+  int acc_x;
+  int acc_y;
+  int acc_z;
+  bool bt_c;
+  bool bt_z;
 } chuck_data;
 
-struct bldc_detect {
-
-
+struct bldc_detect
+{
 public:
-    double cycle_int_limit;
-    double bemf_coupling_k;
-    int hall_res;
+  double cycle_int_limit;
+  double bemf_coupling_k;
+  int hall_res;
 };
 
-
-
-typedef enum {
-    NRF_PAIR_STARTED = 0,
-    NRF_PAIR_OK,
-    NRF_PAIR_FAIL
+typedef enum
+{
+  NRF_PAIR_STARTED = 0,
+  NRF_PAIR_OK,
+  NRF_PAIR_FAIL
 } NRF_PAIR_RES;
 
-#endif // DATATYPES_H
+#endif  // DATATYPES_H

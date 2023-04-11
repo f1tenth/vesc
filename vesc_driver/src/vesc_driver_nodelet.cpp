@@ -8,19 +8,19 @@
 namespace vesc_driver
 {
 
-class VescDriverNodelet: public nodelet::Nodelet
+class VescDriverNodelet : public nodelet::Nodelet
 {
 public:
-
-  VescDriverNodelet() {}
+  VescDriverNodelet()
+  {
+  }
 
 private:
-
   virtual void onInit(void);
 
   boost::shared_ptr<VescDriver> vesc_driver_;
 
-}; // class VescDriverNodelet
+};  // class VescDriverNodelet
 
 void VescDriverNodelet::onInit()
 {
@@ -28,6 +28,6 @@ void VescDriverNodelet::onInit()
   vesc_driver_.reset(new VescDriver(getNodeHandle(), getPrivateNodeHandle()));
 }
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
 PLUGINLIB_EXPORT_CLASS(vesc_driver::VescDriverNodelet, nodelet::Nodelet);

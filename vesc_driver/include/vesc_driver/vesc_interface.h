@@ -24,9 +24,8 @@ namespace vesc_driver
 class VescInterface : private boost::noncopyable
 {
 public:
-
-  typedef boost::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef boost::function<void (const std::string&)> ErrorHandlerFunction;
+  typedef boost::function<void(const VescPacketConstPtr&)> PacketHandlerFunction;
+  typedef boost::function<void(const std::string&)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not
@@ -94,7 +93,6 @@ public:
 
   void requestImuData();
 
-
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
@@ -107,19 +105,26 @@ class SerialException : public std::exception
   // Disable copy constructors
   SerialException& operator=(const SerialException&);
   std::string e_what_;
+
 public:
-  SerialException (const char *description) {
-      std::stringstream ss;
-      ss << "SerialException " << description << " failed.";
-      e_what_ = ss.str();
+  SerialException(const char* description)
+  {
+    std::stringstream ss;
+    ss << "SerialException " << description << " failed.";
+    e_what_ = ss.str();
   }
-  SerialException (const SerialException& other) : e_what_(other.e_what_) {}
-  virtual ~SerialException() throw() {}
-  virtual const char* what () const throw () {
+  SerialException(const SerialException& other) : e_what_(other.e_what_)
+  {
+  }
+  virtual ~SerialException() throw()
+  {
+  }
+  virtual const char* what() const throw()
+  {
     return e_what_.c_str();
   }
 };
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_INTERFACE_H_
+#endif  // VESC_DRIVER_VESC_INTERFACE_H_

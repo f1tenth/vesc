@@ -18,9 +18,7 @@ namespace vesc_driver
 class VescDriver
 {
 public:
-
-  VescDriver(ros::NodeHandle nh,
-             ros::NodeHandle private_nh);
+  VescDriver(ros::NodeHandle nh, ros::NodeHandle private_nh);
 
 private:
   // interface to the VESC
@@ -61,15 +59,16 @@ private:
   ros::Timer timer_;
 
   // driver modes (possible states)
-  typedef enum {
+  typedef enum
+  {
     MODE_INITIALIZING,
     MODE_OPERATING
   } driver_mode_t;
 
   // other variables
-  driver_mode_t driver_mode_;           ///< driver state machine mode (state)
-  int fw_version_major_;                ///< firmware major version reported by vesc
-  int fw_version_minor_;                ///< firmware minor version reported by vesc
+  driver_mode_t driver_mode_;  ///< driver state machine mode (state)
+  int fw_version_major_;       ///< firmware major version reported by vesc
+  int fw_version_minor_;       ///< firmware minor version reported by vesc
 
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);
@@ -81,6 +80,6 @@ private:
   void servoCallback(const std_msgs::Float64::ConstPtr& servo);
 };
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_DRIVER_H_
+#endif  // VESC_DRIVER_VESC_DRIVER_H_

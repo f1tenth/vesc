@@ -45,7 +45,8 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannMsgPtr& cmd)
   servo_msg->data = steering_to_servo_gain_ * cmd->drive.steering_angle + steering_to_servo_offset_;
 
   // publish
-  if (ros::ok()) {
+  if (ros::ok())
+  {
     erpm_pub_.publish(erpm_msg);
     servo_pub_.publish(servo_msg);
   }
@@ -61,4 +62,4 @@ inline bool getRequiredParam(const ros::NodeHandle& nh, std::string name, T& val
   return false;
 }
 
-} // namespace vesc_ackermann
+}  // namespace vesc_ackermann

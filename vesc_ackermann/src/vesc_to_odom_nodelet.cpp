@@ -8,19 +8,19 @@
 namespace vesc_ackermann
 {
 
-class VescToOdomNodelet: public nodelet::Nodelet
+class VescToOdomNodelet : public nodelet::Nodelet
 {
 public:
-
-  VescToOdomNodelet() {}
+  VescToOdomNodelet()
+  {
+  }
 
 private:
-
   virtual void onInit(void);
 
   boost::shared_ptr<VescToOdom> vesc_to_odom_;
 
-}; // class VescToOdomNodelet
+};  // class VescToOdomNodelet
 
 void VescToOdomNodelet::onInit()
 {
@@ -28,6 +28,6 @@ void VescToOdomNodelet::onInit()
   vesc_to_odom_.reset(new VescToOdom(getNodeHandle(), getPrivateNodeHandle()));
 }
 
-} // namespace vesc_ackermann
+}  // namespace vesc_ackermann
 
 PLUGINLIB_EXPORT_CLASS(vesc_ackermann::VescToOdomNodelet, nodelet::Nodelet);

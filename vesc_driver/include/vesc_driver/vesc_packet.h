@@ -25,28 +25,33 @@ typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeCon
 class VescFrame
 {
 public:
-  virtual ~VescFrame() {}
+  virtual ~VescFrame()
+  {
+  }
 
   // getters
-  virtual const Buffer& frame() const {return *frame_;}
+  virtual const Buffer& frame() const
+  {
+    return *frame_;
+  }
 
   // VESC packet properties
-  static const int VESC_MAX_PAYLOAD_SIZE = 1024;          ///< Maximum VESC payload size, in bytes
-  static const int VESC_MIN_FRAME_SIZE = 5;               ///< Smallest VESC frame size, in bytes
-  static const int VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE; ///< Largest VESC frame size, in bytes
-  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2; ///< VESC start of "small" frame value
-  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3; ///< VESC start of "large" frame value
-  static const unsigned int VESC_EOF_VAL = 3;             ///< VESC end-of-frame value
+  static const int VESC_MAX_PAYLOAD_SIZE = 1024;                     ///< Maximum VESC payload size, in bytes
+  static const int VESC_MIN_FRAME_SIZE = 5;                          ///< Smallest VESC frame size, in bytes
+  static const int VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  ///< Largest VESC frame size, in bytes
+  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2;            ///< VESC start of "small" frame value
+  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3;            ///< VESC start of "large" frame value
+  static const unsigned int VESC_EOF_VAL = 3;                        ///< VESC end-of-frame value
 
   /** CRC parameters for the VESC */
   typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
 
-  protected:
+protected:
   /** Construct frame with specified payload size. */
   VescFrame(int payload_size);
 
-  boost::shared_ptr<Buffer> frame_; ///< Stores frame data, shared_ptr for shallow copy
-  BufferRange payload_;             ///< View into frame's payload section
+  boost::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
+  BufferRange payload_;              ///< View into frame's payload section
 
 private:
   /** Construct from buffer. Used by VescPacketFactory factory. */
@@ -62,9 +67,14 @@ private:
 class VescPacket : public VescFrame
 {
 public:
-  virtual ~VescPacket() {}
+  virtual ~VescPacket()
+  {
+  }
 
-  virtual const std::string& name() const {return name_;}
+  virtual const std::string& name() const
+  {
+    return name_;
+  }
 
 protected:
   VescPacket(const std::string& name, int payload_size, int payload_id);
@@ -86,14 +96,12 @@ public:
 
   int fwMajor() const;
   int fwMinor() const;
-
 };
 
 class VescPacketRequestFWVersion : public VescPacket
 {
 public:
   VescPacketRequestFWVersion();
-
 };
 
 /*------------------------------------------------------------------------------------------------*/
@@ -122,7 +130,6 @@ public:
   double tachometer() const;
   double tachometer_abs() const;
   int fault_code() const;
-
 };
 
 class VescPacketRequestValues : public VescPacket
@@ -203,11 +210,11 @@ class VescPacketImu : public VescPacket
 public:
   explicit VescPacketImu(boost::shared_ptr<VescFrame> raw);
 
-  int    mask()  const;
+  int mask() const;
 
-  double yaw()   const;
+  double yaw() const;
   double pitch() const;
-  double roll()  const;
+  double roll() const;
 
   double acc_x() const;
   double acc_y() const;
@@ -227,7 +234,7 @@ public:
   double q_z() const;
 
 private:
-  double getFloat32Auto(uint32_t * pos) const;
+  double getFloat32Auto(uint32_t* pos) const;
 
   uint32_t mask_;
   double roll_;
@@ -254,7 +261,6 @@ private:
 
 /*------------------------------------------------------------------------------------------------*/
 
+}  // namespace vesc_driver
 
-} // namespace vesc_driver
-
-#endif // VESC_DRIVER_VESC_PACKET_H_
+#endif  // VESC_DRIVER_VESC_PACKET_H_

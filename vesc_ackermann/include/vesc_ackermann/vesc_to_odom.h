@@ -15,7 +15,6 @@ namespace vesc_ackermann
 class VescToOdom
 {
 public:
-
   VescToOdom(ros::NodeHandle nh, ros::NodeHandle private_nh);
 
 private:
@@ -32,8 +31,8 @@ private:
 
   // odometry state
   double x_, y_, yaw_;
-  std_msgs::Float64::ConstPtr last_servo_cmd_; ///< Last servo position commanded value
-  vesc_msgs::VescStateStamped::ConstPtr last_state_; ///< Last received state message
+  std_msgs::Float64::ConstPtr last_servo_cmd_;        ///< Last servo position commanded value
+  vesc_msgs::VescStateStamped::ConstPtr last_state_;  ///< Last received state message
 
   // ROS services
   ros::Publisher odom_pub_;
@@ -46,6 +45,6 @@ private:
   void servoCmdCallback(const std_msgs::Float64::ConstPtr& servo);
 };
 
-} // namespace vesc_ackermann
+}  // namespace vesc_ackermann
 
-#endif // VESC_ACKERMANN_VESC_TO_ODOM_H_
+#endif  // VESC_ACKERMANN_VESC_TO_ODOM_H_

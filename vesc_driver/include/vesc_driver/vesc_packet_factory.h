@@ -46,8 +46,7 @@ public:
    *
    * @return Pointer to a valid VescPacket if successful. Otherwise, an empty pointer.
    */
-  static VescPacketPtr createPacket(const Buffer::const_iterator& begin,
-                                    const Buffer::const_iterator& end,
+  static VescPacketPtr createPacket(const Buffer::const_iterator& begin, const Buffer::const_iterator& end,
                                     int* num_bytes_needed, std::string* what);
 
   typedef boost::function<VescPacketPtr(boost::shared_ptr<VescFrame>)> CreateFn;
@@ -56,27 +55,26 @@ public:
   static void registerPacketType(int payload_id, CreateFn fn);
 
 private:
-
-  typedef std::map<int, CreateFn > FactoryMap;
+  typedef std::map<int, CreateFn> FactoryMap;
   static FactoryMap* getMap();
 };
 
 /** Use this macro to register packets */
-#define REGISTER_PACKET_TYPE(id, klass)   \
-class klass##Factory \
-{ \
-public: \
-  klass##Factory() \
-  { \
-    VescPacketFactory::registerPacketType((id), &klass##Factory::create); \
-  } \
-  static VescPacketPtr create(boost::shared_ptr<VescFrame> frame) \
-  { \
-    return VescPacketPtr(new klass(frame)); \
-  } \
-}; \
-static klass##Factory global_##klass##Factory;
+#define REGISTER_PACKET_TYPE(id, klass)                                                                                \
+  class klass##Factory                                                                                                 \
+  {                                                                                                                    \
+  public:                                                                                                              \
+    klass##Factory()                                                                                                   \
+    {                                                                                                                  \
+      VescPacketFactory::registerPacketType((id), &klass##Factory::create);                                            \
+    }                                                                                                                  \
+    static VescPacketPtr create(boost::shared_ptr<VescFrame> frame)                                                    \
+    {                                                                                                                  \
+      return VescPacketPtr(new klass(frame));                                                                          \
+    }                                                                                                                  \
+  };                                                                                                                   \
+  static klass##Factory global_##klass##Factory;
 
-} // namespace vesc_driver
+}  // namespace vesc_driver
 
-#endif // VESC_DRIVER_VESC_PACKET_FACTORY_H_
+#endif  // VESC_DRIVER_VESC_PACKET_FACTORY_H_
