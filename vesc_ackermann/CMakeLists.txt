@@ -1,29 +1,38 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vesc_ackermann)
 
+# Setting C++ standard to 11
+if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_STANDARD 11)
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
+  ackermann_msgs
+  geometry_msgs
+  nav_msgs
   nodelet
   pluginlib
   roscpp
-  nav_msgs
+  roslint
   std_msgs
-  geometry_msgs
   tf
-  ackermann_msgs
   vesc_msgs
 )
 
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
+    ackermann_msgs
+    geometry_msgs
+    nav_msgs
     nodelet
     pluginlib
-    roscpp
-    nav_msgs#!/usr/bin/env python
     std_msgs
-    geometry_msgs
     tf
-    ackermann_msgs
     vesc_msgs
 )
 
@@ -33,7 +42,6 @@ catkin_package(
 
 include_directories(
   include
-  ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -62,6 +70,9 @@ target_link_libraries(vesc_ackermann_nodelet
   ${catkin_LIBRARIES}
 )
 
+set(ROSLINT_CPP_OPTS "--filter=-build/c++11")
+roslint_cpp()
+
 #############
 ## Install ##
 #############
@@ -85,4 +96,6 @@ install(DIRECTORY launch/
 ## Testing ##
 #############
 
-# TODO
+if(CATKIN_ENABLE_TESTING)
+  roslint_add_test()
+endif()
