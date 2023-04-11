@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>vesc_msgs</name>
-  <version>0.0.1</version>
+  <version>1.1.0</version>
   <description>
     ROS message definitions for the Vedder VESC open source motor controller.
   </description>
-
-  <maintainer email="boulet@ll.mit.edu">Michael T. Boulet</maintainer>
-  <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <maintainer email="joebetz@seas.upenn.edu">Johannes Betz</maintainer>
   <license>BSD</license>
-
   <url type="website">http://ros.org/wiki/vesc_msgs</url>
-  <url type="repository">https://github.mit.edu/racecar/vesc</url>
-  <url type="bugtracker">https://github.mit.edu/racecar/vesc/issues</url>
+  <url type="repository">https://github.com/f1tenth/vesc</url>
+  <url type="bugtracker">https://github.com/f1tenth/vesc/issues</url>
+  <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <author email="josh.whitley@autoware.org">Joshua Whitley</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -20,8 +20,8 @@
   <build_depend>message_generation</build_depend>
   <build_depend>geometry_msgs</build_depend>
 
-  <run_depend>std_msgs</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>geometry_msgs</run_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
 
 </package>

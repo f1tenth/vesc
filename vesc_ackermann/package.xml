@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>vesc_ackermann</name>
-  <version>0.0.1</version>
+  <version>1.1.0</version>
   <description>
     Translate between VESC messages and ROS ackermann and odometry messages.
   </description>
-
-  <maintainer email="boulet@ll.mit.edu">Michael T. Boulet</maintainer>
-  <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <maintainer email="joebetz@seas.upenn.edu">Johannes Betz</maintainer>
   <license>BSD</license>
-
   <url type="website">http://www.ros.org/wiki/vesc_ackermann</url>
-  <url type="repository">https://github.mit.edu/racecar/racecar-iap</url>
-  <url type="bugtracker">https://github.mit.edu/racecar/racecar-iap/issues</url>
+  <url type="repository">https://github.com/f1tenth/vesc</url>
+  <url type="bugtracker">https://github.com/f1tenth/vesc/issues</url>
+  <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
+  <author email="josh.whitley@autoware.org">Joshua Whitley</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -26,15 +26,15 @@
   <build_depend>ackermann_msgs</build_depend>
   <build_depend>vesc_msgs</build_depend>
 
-  <run_depend>nodelet</run_depend>
-  <run_depend>pluginlib</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>nav_msgs</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>ackermann_msgs</run_depend>
-  <run_depend>vesc_msgs</run_depend>
+  <exec_depend>nodelet</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>ackermann_msgs</exec_depend>
+  <exec_depend>vesc_msgs</exec_depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_ackermann_nodelet.xml"/>
