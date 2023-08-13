@@ -25,7 +25,7 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_interface.h"
+#include "vesc_driver/vesc_interface.hpp"
 
 #include <pthread.h>
 
@@ -39,7 +39,7 @@
 
 #include <serial/serial.h>
 
-#include "vesc_driver/vesc_packet_factory.h"
+#include "vesc_driver/vesc_packet_factory.hpp"
 
 namespace vesc_driver
 {
@@ -167,13 +167,13 @@ VescInterface::~VescInterface()
 
 void VescInterface::setPacketHandler(const PacketHandlerFunction& handler)
 {
-  // todo - definately need mutex
+  // todo - definitely need mutex
   impl_->packet_handler_ = handler;
 }
 
 void VescInterface::setErrorHandler(const ErrorHandlerFunction& handler)
 {
-  // todo - definately need mutex
+  // todo - definitely need mutex
   impl_->error_handler_ = handler;
 }
 
@@ -271,6 +271,11 @@ void VescInterface::setPosition(double position)
 void VescInterface::setServo(double servo)
 {
   send(VescPacketSetServoPos(servo));
+}
+
+void VescInterface::requestImuData()
+{
+  send(VescPacketRequestImu());
 }
 
 }  // namespace vesc_driver

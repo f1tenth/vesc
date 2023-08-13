@@ -25,47 +25,51 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
-#include "vesc_driver/vesc_driver.h"
+#include "vesc_driver/vesc_driver.hpp"
 
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include <vesc_msgs/VescStateStamped.h>
 
 namespace vesc_driver
 {
 
+using namespace std::chrono_literals;
 using std::placeholders::_1;
+
 
 VescDriver::VescDriver(ros::NodeHandle nh,
                        ros::NodeHandle private_nh) :
   vesc_(std::string(),
         std::bind(&VescDriver::vescPacketCallback, this, _1),
         std::bind(&VescDriver::vescErrorCallback, this, _1)),
-  duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0), current_limit_(private_nh, "current"),
-  brake_limit_(private_nh, "brake"), speed_limit_(private_nh, "speed"),
-  position_limit_(private_nh, "position"), servo_limit_(private_nh, "servo", 0.0, 1.0),
-  driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1)
+  duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0),
+  current_limit_(private_nh, "current"),
+  brake_limit_(private_nh, "brake"),
+  speed_limit_(private_nh, "speed"),
+  position_limit_(private_nh, "position"),
+  servo_limit_(private_nh, "servo", 0.0, 1.0),
+  driver_mode_(MODE_INITIALIZING),
+  fw_version_major_(-1),
+  fw_version_minor_(-1)
 {
+
   // get vesc serial port address
   std::string port;
-  if (!private_nh.getParam("port", port))
-  {
+  if (!private_nh.getParam("port", port)) {
     ROS_FATAL("VESC communication port parameter required.");
     ros::shutdown();
     return;
   }
 
   // attempt to connect to the serial port
-  try
-  {
+  try {
     vesc_.connect(port);
-  }
-  catch (SerialException e)
-  {
+  } catch (SerialException e) {
     ROS_FATAL("Failed to connect to the VESC, %s.", e.what());
     ros::shutdown();
     return;
@@ -73,6 +77,8 @@ VescDriver::VescDriver(ros::NodeHandle nh,
 
   // create vesc state (telemetry) publisher
   state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 10);
+  imu_pub_ = nh.advertise<vesc_msgs::VescImuStamped>("sensors/imu", 10);
+  imu_std_pub_ = nh.advertise<sensor_msgs::Imu>("sensors/imu/raw", 10);
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
@@ -135,6 +141,8 @@ void VescDriver::timerCallback(const ros::TimerEvent& event)
   {
     // poll for vesc state (telemetry)
     vesc_.requestState();
+    // poll for vesc imu
+    vesc_.requestImuData();
   }
   else
   {
@@ -152,12 +160,15 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& pac
 
     vesc_msgs::VescStateStamped::Ptr state_msg(new vesc_msgs::VescStateStamped);
     state_msg->header.stamp = ros::Time::now();
+
     state_msg->state.voltage_input = values->v_in();
-    state_msg->state.temperature_pcb = values->temp_pcb();
-    state_msg->state.current_motor = values->current_motor();
-    state_msg->state.current_input = values->current_in();
+    state_msg->state.current_motor = values->avg_motor_current();
+    state_msg->state.current_input = values->avg_input_current();
+    state_msg->state.avg_id = values->avg_id();
+    state_msg->state.avg_iq = values->avg_iq();
+    state_msg->state.duty_cycle = values->duty_cycle_now();
     state_msg->state.speed = values->rpm();
-    state_msg->state.duty_cycle = values->duty_now();
+
     state_msg->state.charge_drawn = values->amp_hours();
     state_msg->state.charge_regen = values->amp_hours_charged();
     state_msg->state.energy_drawn = values->watt_hours();
@@ -166,16 +177,72 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& pac
     state_msg->state.distance_traveled = values->tachometer_abs();
     state_msg->state.fault_code = values->fault_code();
 
+    state_msg->state.pid_pos_now = values->pid_pos_now();
+    state_msg->state.controller_id = values->controller_id();
+
+    state_msg->state.ntc_temp_mos1 = values->temp_mos1();
+    state_msg->state.ntc_temp_mos2 = values->temp_mos2();
+    state_msg->state.ntc_temp_mos3 = values->temp_mos3();
+    state_msg->state.avg_vd = values->avg_vd();
+    state_msg->state.avg_vq = values->avg_vq();
+
     state_pub_.publish(state_msg);
-  }
-  else if (packet->name() == "FWVersion")
-  {
+  } else if (packet->name() == "FWVersion") {
     std::shared_ptr<VescPacketFWVersion const> fw_version =
       std::dynamic_pointer_cast<VescPacketFWVersion const>(packet);
     // todo: might need lock here
     fw_version_major_ = fw_version->fwMajor();
     fw_version_minor_ = fw_version->fwMinor();
+  } else if (packet->name() == "ImuData") {
+    std::shared_ptr<VescPacketImu const> imuData = std::dynamic_pointer_cast<VescPacketImu const>(packet);
+
+    vesc_msgs::VescImuStamped::Ptr imu_msg(new vesc_msgs::VescImuStamped);
+    sensor_msgs::ImuPtr std_imu_msg(new sensor_msgs::Imu);
+    imu_msg->header.stamp = ros::Time::now();
+    std_imu_msg->header.stamp = ros::Time::now();
+
+    imu_msg->imu.ypr.x = imuData->roll();
+    imu_msg->imu.ypr.y = imuData->pitch();
+    imu_msg->imu.ypr.z = imuData->yaw();
+
+    imu_msg->imu.linear_acceleration.x = imuData->acc_x();
+    imu_msg->imu.linear_acceleration.y = imuData->acc_y();
+    imu_msg->imu.linear_acceleration.z = imuData->acc_z();
+
+    imu_msg->imu.angular_velocity.x = imuData->gyr_x();
+    imu_msg->imu.angular_velocity.y = imuData->gyr_y();
+    imu_msg->imu.angular_velocity.z = imuData->gyr_z();
+
+    imu_msg->imu.compass.x = imuData->mag_x();
+    imu_msg->imu.compass.y = imuData->mag_y();
+    imu_msg->imu.compass.z = imuData->mag_z();
+
+    imu_msg->imu.orientation.w = imuData->q_w();
+    imu_msg->imu.orientation.x = imuData->q_x();
+    imu_msg->imu.orientation.y = imuData->q_y();
+    imu_msg->imu.orientation.z = imuData->q_z();
+
+    std_imu_msg->linear_acceleration.x = imuData->acc_x();
+    std_imu_msg->linear_acceleration.y = imuData->acc_y();
+    std_imu_msg->linear_acceleration.z = imuData->acc_z();
+
+    std_imu_msg->angular_velocity.x = imuData->gyr_x();
+    std_imu_msg->angular_velocity.y = imuData->gyr_y();
+    std_imu_msg->angular_velocity.z = imuData->gyr_z();
+
+    std_imu_msg->orientation.w = imuData->q_w();
+    std_imu_msg->orientation.x = imuData->q_x();
+    std_imu_msg->orientation.y = imuData->q_y();
+    std_imu_msg->orientation.z = imuData->q_z();
+
+    imu_pub_.publish(imu_msg);
+    imu_std_pub_.publish(std_imu_msg);
   }
+  ROS_DEBUG_THROTTLE(
+          5,
+          "%s packet received",
+          packet->name().c_str()
+  );
 }
 
 void VescDriver::vescErrorCallback(const std::string& error)
@@ -267,8 +334,8 @@ void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
 }
 
 VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::string& str,
-                                       const boost::optional<double>& min_lower,
-                                       const boost::optional<double>& max_upper) :
+                                       const std::experimental::optional<double>& min_lower,
+                                       const std::experimental::optional<double>& max_upper) :
   name(str)
 {
   // check if user's minimum value is outside of the range min_lower to max_upper

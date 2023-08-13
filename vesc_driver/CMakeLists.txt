@@ -1,16 +1,16 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.4)
 project(vesc_driver)
 
-# Set minimum C++ standard to C++11
-if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
-  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
-  set(CMAKE_CXX_STANDARD 11)
+# Set minimum C++ standard to C++14
+if(NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+elseif("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++14")
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
-find_package(Boost REQUIRED)
+# find_package(Boost REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   nodelet
@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslint
   serial
   std_msgs
+  geometry_msgs
   vesc_msgs
 )
 
@@ -63,13 +64,25 @@ target_link_libraries(vesc_driver_nodelet
   ${catkin_LIBRARIES}
 )
 
+add_executable(
+  vesc_device_namer
+  src/vesc_device_namer.cpp
+  src/vesc_device_uuid_lookup.cpp
+        src/vesc_interface.cpp
+        src/vesc_packet.cpp
+        src/vesc_packet_factory.cpp
+)
+target_link_libraries(vesc_device_namer
+        ${catkin_LIBRARIES}
+        )
+
 file(GLOB_RECURSE ${PROJECT_NAME}_CPP_FILES
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  . *.cpp *.h)
+  . *.cpp *.hpp)
 list(REMOVE_ITEM ${PROJECT_NAME}_CPP_FILES
-  include/${PROJECT_NAME}/crc.h)
+  include/${PROJECT_NAME}/crc.hpp)
 
-set(ROSLINT_CPP_OPTS "--filter=-build/c++11")
+set(ROSLINT_CPP_OPTS "--filter=-build/c++14")
 roslint_cpp(${${PROJECT_NAME}_CPP_FILES})
 
 #############

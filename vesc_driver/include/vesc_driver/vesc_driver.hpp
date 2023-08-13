@@ -28,15 +28,19 @@
 #ifndef VESC_DRIVER_VESC_DRIVER_H_
 #define VESC_DRIVER_VESC_DRIVER_H_
 
+#include <ros/ros.h>
+#include <std_msgs/Float64.h>
+#include <sensor_msgs/Imu.h>
+#include <vesc_msgs/VescState.h>
+#include <vesc_msgs/VescStateStamped.h>
+#include <vesc_msgs/VescImu.h>
+#include <vesc_msgs/VescImuStamped.h>
+#include <experimental/optional>
 #include <memory>
 #include <string>
 
-#include <ros/ros.h>
-#include <std_msgs/Float64.h>
-#include <boost/optional.hpp>
-
-#include "vesc_driver/vesc_interface.h"
-#include "vesc_driver/vesc_packet.h"
+#include "vesc_driver/vesc_interface.hpp"
+#include "vesc_driver/vesc_packet.hpp"
 
 namespace vesc_driver
 {
@@ -57,12 +61,12 @@ private:
   struct CommandLimit
   {
     CommandLimit(const ros::NodeHandle& nh, const std::string& str,
-                 const boost::optional<double>& min_lower = boost::optional<double>(),
-                 const boost::optional<double>& max_upper = boost::optional<double>());
+                 const std::experimental::optional<double>& min_lower = std::experimental::optional<double>(),
+                 const std::experimental::optional<double>& max_upper = std::experimental::optional<double>());
     double clip(double value);
     std::string name;
-    boost::optional<double> lower;
-    boost::optional<double> upper;
+    std::experimental::optional<double> lower;
+    std::experimental::optional<double> upper;
   };
   CommandLimit duty_cycle_limit_;
   CommandLimit current_limit_;
@@ -73,6 +77,9 @@ private:
 
   // ROS services
   ros::Publisher state_pub_;
+  ros::Publisher imu_pub_;
+  ros::Publisher imu_std_pub_;
+
   ros::Publisher servo_sensor_pub_;
   ros::Subscriber duty_cycle_sub_;
   ros::Subscriber current_sub_;
@@ -96,13 +103,13 @@ private:
   int fw_version_minor_;                ///< firmware minor version reported by vesc
 
   // ROS callbacks
-  void timerCallback(const ros::TimerEvent& event);
-  void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
-  void currentCallback(const std_msgs::Float64::ConstPtr& current);
   void brakeCallback(const std_msgs::Float64::ConstPtr& brake);
-  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
+  void currentCallback(const std_msgs::Float64::ConstPtr& current);
+  void dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle);
   void positionCallback(const std_msgs::Float64::ConstPtr& position);
   void servoCallback(const std_msgs::Float64::ConstPtr& servo);
+  void speedCallback(const std_msgs::Float64::ConstPtr& speed);
+  void timerCallback(const ros::TimerEvent& event);
 };
 
 }  // namespace vesc_driver

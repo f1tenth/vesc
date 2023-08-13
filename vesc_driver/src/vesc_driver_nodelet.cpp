@@ -29,7 +29,7 @@
 
 #include <memory>
 
-#include "vesc_driver/vesc_driver.h"
+#include "vesc_driver/vesc_driver.hpp"
 
 namespace vesc_driver
 {

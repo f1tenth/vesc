@@ -22,6 +22,7 @@
   <depend>roscpp</depend>
   <depend>serial</depend>
   <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>vesc_msgs</depend>
 
   <export>
