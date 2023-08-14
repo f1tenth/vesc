@@ -227,29 +227,6 @@ typedef enum
   DISP_POS_MODE_ENCODER_OBSERVER_ERROR
 } disp_pos_mode;
 
-// BUGBUG -- Possible removed/relocated
-struct MC_VALUES
-{
-public:
-  double v_in;
-  double temp_mos;
-  double temp_motor;
-  double current_motor;
-  double current_in;
-  double id;
-  double iq;
-  double rpm;
-  double duty_now;
-  double amp_hours;
-  double amp_hours_charged;
-  double watt_hours;
-  double watt_hours_charged;
-  int tachometer;
-  int tachometer_abs;
-  double position;
-  mc_fault_code fault_code;
-};
-
 typedef enum
 {
   SENSOR_PORT_MODE_HALL = 0,
@@ -1080,14 +1057,6 @@ typedef struct
   float vq;
 } mc_values;
 
-// BUGBUG -- possible delete
-struct bldc_detect
-{
-public:
-  double cycle_int_limit;
-  double bemf_coupling_k;
-  int hall_res;
-};
 
 typedef enum
 {
