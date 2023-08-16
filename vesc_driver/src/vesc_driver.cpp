@@ -76,9 +76,9 @@ VescDriver::VescDriver(ros::NodeHandle nh,
   }
 
   // create vesc state (telemetry) publisher
-  state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 10);
-  imu_pub_ = nh.advertise<vesc_msgs::VescImuStamped>("sensors/imu", 10);
-  imu_std_pub_ = nh.advertise<sensor_msgs::Imu>("sensors/imu/raw", 10);
+  state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 1);
+  imu_pub_ = nh.advertise<vesc_msgs::VescImuStamped>("sensors/imu", 1);
+  imu_std_pub_ = nh.advertise<sensor_msgs::Imu>("sensors/imu/raw", 1);
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
