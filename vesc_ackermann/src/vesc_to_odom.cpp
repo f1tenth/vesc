@@ -63,7 +63,7 @@ VescToOdom::VescToOdom(ros::NodeHandle nh, ros::NodeHandle private_nh) :
   private_nh.param("publish_tf", publish_tf_, publish_tf_);
 
   // create odom publisher
-  odom_pub_ = nh.advertise<nav_msgs::Odometry>("odom", 10);
+  odom_pub_ = nh.advertise<nav_msgs::Odometry>("odom", 1);
 
   // create tf broadcaster
   if (publish_tf_)
