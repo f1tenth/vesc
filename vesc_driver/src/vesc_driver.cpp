@@ -84,7 +84,7 @@ VescDriver::VescDriver(ros::NodeHandle nh,
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
-  servo_sensor_pub_ = nh.advertise<std_msgs::Float64>("sensors/servo_position_command", 10);
+  servo_sensor_pub_ = nh.advertise<std_msgs::Float64>("sensors/servo_position_command", 1);
 
   // subscribe to motor and servo command topics
   duty_cycle_sub_ = nh.subscribe("commands/motor/duty_cycle", 10,
