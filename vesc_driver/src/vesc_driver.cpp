@@ -57,7 +57,6 @@ VescDriver::VescDriver(ros::NodeHandle nh,
   fw_version_major_(-1),
   fw_version_minor_(-1)
 {
-
   // get vesc serial port address
   std::string port;
   if (!private_nh.getParam("port", port)) {
@@ -65,6 +64,9 @@ VescDriver::VescDriver(ros::NodeHandle nh,
     ros::shutdown();
     return;
   }
+
+  // get vesc imu reference frame -- use default value if not spec'd as non-critical failure
+  private_nh.param<std::string>("imu_frame", imu_frame_, "imu");
 
   // attempt to connect to the serial port
   try {
@@ -200,6 +202,9 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& pac
     sensor_msgs::ImuPtr std_imu_msg(new sensor_msgs::Imu);
     imu_msg->header.stamp = ros::Time::now();
     std_imu_msg->header.stamp = ros::Time::now();
+
+    imu_msg->header.frame_id = imu_frame_;
+    std_imu_msg->header.frame_id = imu_frame_;
 
     imu_msg->imu.ypr.x = imuData->roll();
     imu_msg->imu.ypr.y = imuData->pitch();
