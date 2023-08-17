@@ -65,8 +65,8 @@ VescDriver::VescDriver(ros::NodeHandle nh,
     return;
   }
 
-  // get vesc imu reference frame -- use default value if not spec'd as non-critical failure
   private_nh.param<std::string>("imu_frame", imu_frame_, "imu");
+  private_nh.param<bool>("invert_y", invert_y_, false);
 
   // attempt to connect to the serial port
   try {
@@ -330,6 +330,9 @@ void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
   if (driver_mode_ == MODE_OPERATING)
   {
     double servo_clipped(servo_limit_.clip(servo->data));
+    if( invert_y_ ) {
+      servo_clipped = 1.0 - servo_clipped;
+    }
     vesc_.setServo(servo_clipped);
     // publish clipped servo value as a "sensor"
     std_msgs::Float64::Ptr servo_sensor_msg(new std_msgs::Float64);

@@ -57,6 +57,7 @@ private:
   void vescPacketCallback(const std::shared_ptr<VescPacket const>& packet);
   void vescErrorCallback(const std::string& error);
   std::string imu_frame_;
+  bool invert_y_;
 
   // limits on VESC commands
   struct CommandLimit
