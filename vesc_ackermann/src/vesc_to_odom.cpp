@@ -138,6 +138,11 @@ void VescToOdom::vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& 
   /** @todo Think about position uncertainty, perhaps get from parameters? */
   odom->pose.covariance[0]  = 0.2;  ///< x
   odom->pose.covariance[7]  = 0.2;  ///< y
+  // Other positions have huge uncertainty as they aren't measured -- added to stop robot pose EKF
+  // from complaining
+  odom->pose.covariance[14] = 1000;  ///< z
+  odom->pose.covariance[21] = 1000;  ///< roll
+  odom->pose.covariance[28] = 1000;  ///< pitch
   odom->pose.covariance[35] = 0.4;  ///< yaw
 
   // Velocity ("in the coordinate frame given by the child_frame_id")
