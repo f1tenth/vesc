@@ -34,6 +34,7 @@
 #include <ros/ros.h>
 #include <vesc_msgs/VescStateStamped.h>
 #include <std_msgs/Float64.h>
+#include <boost/shared_ptr.hpp>
 #include <tf/transform_broadcaster.h>
 
 namespace vesc_ackermann
@@ -58,14 +59,14 @@ private:
 
   // odometry state
   double x_, y_, yaw_;
-  std_msgs::Float64::ConstPtr last_servo_cmd_;  ///< Last servo position commanded value
+  std_msgs::Float64::ConstPtr last_servo_cmd_;        ///< Last servo position commanded value
   vesc_msgs::VescStateStamped::ConstPtr last_state_;  ///< Last received state message
 
   // ROS services
   ros::Publisher odom_pub_;
   ros::Subscriber vesc_state_sub_;
   ros::Subscriber servo_sub_;
-  std::shared_ptr<tf::TransformBroadcaster> tf_pub_;
+  boost::shared_ptr<tf::TransformBroadcaster> tf_pub_;
 
   // ROS callbacks
   void vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& state);

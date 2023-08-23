@@ -28,12 +28,15 @@
 #ifndef VESC_DRIVER_VESC_INTERFACE_H_
 #define VESC_DRIVER_VESC_INTERFACE_H_
 
-#include <exception>
-#include <functional>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
 #include <string>
+#include <sstream>
+#include <exception>
+#include <stdexcept>
+
+#include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -43,11 +46,11 @@ namespace vesc_driver
 /**
  * Class providing an interface to the Vedder VESC motor controller via a serial port interface.
  */
-class VescInterface
+class VescInterface : private boost::noncopyable
 {
 public:
-  typedef std::function<void (const VescPacketConstPtr&)> PacketHandlerFunction;
-  typedef std::function<void (const std::string&)> ErrorHandlerFunction;
+  typedef boost::function<void(const VescPacketConstPtr&)> PacketHandlerFunction;
+  typedef boost::function<void(const std::string&)> ErrorHandlerFunction;
 
   /**
    * Creates a VescInterface object. Opens the serial port interface to the VESC if @p port is not
@@ -63,12 +66,6 @@ public:
   VescInterface(const std::string& port = std::string(),
                 const PacketHandlerFunction& packet_handler = PacketHandlerFunction(),
                 const ErrorHandlerFunction& error_handler = ErrorHandlerFunction());
-
-  /**
-   * Delete copy constructor and equals operator.
-   */
-  VescInterface(const VescInterface &) = delete;
-  VescInterface & operator=(const VescInterface &) = delete;
 
   /**
    * VescInterface destructor.
@@ -119,10 +116,12 @@ public:
   void setPosition(double position);
   void setServo(double servo);
 
+  void requestImuData();
+
 private:
   // Pimpl - hide serial port members from class users
   class Impl;
-  std::unique_ptr<Impl> impl_;
+  boost::scoped_ptr<Impl> impl_;
 };
 
 // todo: review
@@ -131,15 +130,20 @@ class SerialException : public std::exception
   // Disable copy constructors
   SerialException& operator=(const SerialException&);
   std::string e_what_;
+
 public:
-  explicit SerialException(const char *description)
+  SerialException(const char* description)
   {
     std::stringstream ss;
     ss << "SerialException " << description << " failed.";
     e_what_ = ss.str();
   }
-  SerialException(const SerialException& other) : e_what_(other.e_what_) {}
-  virtual ~SerialException() throw() {}
+  SerialException(const SerialException& other) : e_what_(other.e_what_)
+  {
+  }
+  virtual ~SerialException() throw()
+  {
+  }
   virtual const char* what() const throw()
   {
     return e_what_.c_str();

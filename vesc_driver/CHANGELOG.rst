@@ -9,7 +9,7 @@ Changelog for package vesc_driver
 * Exclude crc.h from roslint.
 * Replacing boost::crc with CRCPP.
 * Replacing boost::begin, boost::end, and boost::distance with Standard Library equivalents.
-* Replacing boost::bind with Standard Library equivalent.
+* Replacing boost::bind with Standards Library equivalent.
 * Replaing boost::noncopyable with C++ equivalent.
 * Replacing boost::function with Standard Library version.
 * Replacing Boost smart pointers with Standard Library equivalents.

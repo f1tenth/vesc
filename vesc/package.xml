@@ -14,13 +14,18 @@
   <author email="boulet@ll.mit.edu">Michael T. Boulet</author>
   <author email="josh.whitley@autoware.org">Joshua Whitley</author>
 
+  <url type="website">http://www.ros.org/wiki/vesc</url>
+  <url type="repository">https://github.mit.edu/racecar/vesc</url>
+  <url type="bugtracker">https://github.mit.edu/racecar/vesc/issues</url>
+
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>vesc_driver</exec_depend>
-  <exec_depend>vesc_msgs</exec_depend>
-  <exec_depend>vesc_ackermann</exec_depend>
+  <depend>vesc_driver</depend>
+  <depend>vesc_msgs</depend>
+  <depend>vesc_ackermann</depend>
 
   <export>
     <metapackage/>
   </export>
+
 </package>

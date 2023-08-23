@@ -15,16 +15,23 @@
   <author email="josh.whitley@autoware.org">Joshua Whitley</author>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roslint</build_depend>
+
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>vesc_msgs</build_depend>
+  <build_depend>serial</build_depend>
 
   <depend>nodelet</depend>
   <depend>pluginlib</depend>
   <depend>roscpp</depend>
-  <depend>serial</depend>
   <depend>std_msgs</depend>
   <depend>vesc_msgs</depend>
+  <depend>serial</depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_driver_nodelet.xml"/>
   </export>
+
 </package>

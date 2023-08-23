@@ -29,15 +29,13 @@
 
 #include <pthread.h>
 
-#include <algorithm>
-#include <cassert>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <thread>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 #include <serial/serial.h>
+#include <boost/crc.hpp>
 
 #include "vesc_driver/vesc_packet_factory.h"
 
@@ -47,26 +45,28 @@ namespace vesc_driver
 class VescInterface::Impl
 {
 public:
-  Impl() :
-    serial_(std::string(), 115200, serial::Timeout::simpleTimeout(100),
-            serial::eightbits, serial::parity_none, serial::stopbits_one, serial::flowcontrol_none)
-  {}
-
-  void rxThread();
-
-  std::thread rxThreadHelper()
+  Impl()
+    : serial_(std::string(), 115200, serial::Timeout::simpleTimeout(100), serial::eightbits, serial::parity_none,
+              serial::stopbits_one, serial::flowcontrol_none)
   {
-    return std::thread(&Impl::rxThread, this);
   }
 
-  std::thread rx_thread_;
+  void* rxThread(void);
+
+  static void* rxThreadHelper(void* context)
+  {
+    return ((VescInterface::Impl*)context)->rxThread();
+  }
+
+  pthread_t rx_thread_;
   bool rx_thread_run_;
   PacketHandlerFunction packet_handler_;
   ErrorHandlerFunction error_handler_;
   serial::Serial serial_;
+  VescFrame::CRC send_crc_;
 };
 
-void VescInterface::Impl::rxThread()
+void* VescInterface::Impl::rxThread(void)
 {
   Buffer buffer;
   buffer.reserve(4096);
@@ -82,13 +82,11 @@ void VescInterface::Impl::rxThread()
       while (iter != buffer.end())
       {
         // check if valid start-of-frame character
-        if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *iter ||
-            VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter)
+        if (VescFrame::VESC_SOF_VAL_SMALL_FRAME == *iter || VescFrame::VESC_SOF_VAL_LARGE_FRAME == *iter)
         {
           // good start, now attempt to create packet
           std::string error;
-          VescPacketConstPtr packet =
-            VescPacketFactory::createPacket(iter, buffer.end(), &bytes_needed, &error);
+          VescPacketConstPtr packet = VescPacketFactory::createPacket(iter, buffer.end(), &bytes_needed, &error);
           if (packet)
           {
             // good packet, check if we skipped any data
@@ -137,8 +135,7 @@ void VescInterface::Impl::rxThread()
     }
 
     // attempt to read at least bytes_needed bytes from the serial port
-    int bytes_to_read =
-      std::max(bytes_needed, std::min(4096, static_cast<int>(serial_.available())));
+    int bytes_to_read = std::max(bytes_needed, std::min(4096, static_cast<int>(serial_.available())));
     int bytes_read = serial_.read(buffer, bytes_to_read);
     if (bytes_needed > 0 && 0 == bytes_read && !buffer.empty())
     {
@@ -147,11 +144,9 @@ void VescInterface::Impl::rxThread()
   }
 }
 
-
-VescInterface::VescInterface(const std::string& port,
-                             const PacketHandlerFunction& packet_handler,
-                             const ErrorHandlerFunction& error_handler) :
-  impl_(new Impl())
+VescInterface::VescInterface(const std::string& port, const PacketHandlerFunction& packet_handler,
+                             const ErrorHandlerFunction& error_handler)
+  : impl_(new Impl())
 {
   setPacketHandler(packet_handler);
   setErrorHandler(error_handler);
@@ -201,7 +196,8 @@ void VescInterface::connect(const std::string& port)
 
   // start up a monitoring thread
   impl_->rx_thread_run_ = true;
-  impl_->rx_thread_ = impl_->rxThreadHelper();
+  int result = pthread_create(&impl_->rx_thread_, NULL, &VescInterface::Impl::rxThreadHelper, impl_.get());
+  assert(0 == result);
 }
 
 void VescInterface::disconnect()
@@ -212,7 +208,9 @@ void VescInterface::disconnect()
   {
     // bring down read thread
     impl_->rx_thread_run_ = false;
-    impl_->rx_thread_.join();
+    int result = pthread_join(impl_->rx_thread_, NULL);
+    assert(0 == result);
+
     impl_->serial_.close();
   }
 }
@@ -271,6 +269,11 @@ void VescInterface::setPosition(double position)
 void VescInterface::setServo(double servo)
 {
   send(VescPacketSetServoPos(servo));
+}
+
+void VescInterface::requestImuData()
+{
+  send(VescPacketRequestImu());
 }
 
 }  // namespace vesc_driver

@@ -17,18 +17,28 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>roslint</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>ackermann_msgs</build_depend>
+  <build_depend>vesc_msgs</build_depend>
 
-  <depend>ackermann_msgs</depend>
-  <depend>geometry_msgs</depend>
-  <depend>nav_msgs</depend>
   <depend>nodelet</depend>
   <depend>pluginlib</depend>
   <depend>roscpp</depend>
+  <depend>nav_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>tf</depend>
+  <depend>ackermann_msgs</depend>
   <depend>vesc_msgs</depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_ackermann_nodelet.xml"/>
   </export>
+
 </package>

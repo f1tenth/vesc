@@ -28,7 +28,6 @@
 #ifndef VESC_DRIVER_VESC_DRIVER_H_
 #define VESC_DRIVER_VESC_DRIVER_H_
 
-#include <memory>
 #include <string>
 
 #include <ros/ros.h>
@@ -44,13 +43,12 @@ namespace vesc_driver
 class VescDriver
 {
 public:
-  VescDriver(ros::NodeHandle nh,
-             ros::NodeHandle private_nh);
+  VescDriver(ros::NodeHandle nh, ros::NodeHandle private_nh);
 
 private:
   // interface to the VESC
   VescInterface vesc_;
-  void vescPacketCallback(const std::shared_ptr<VescPacket const>& packet);
+  void vescPacketCallback(const boost::shared_ptr<VescPacket const>& packet);
   void vescErrorCallback(const std::string& error);
 
   // limits on VESC commands
@@ -74,6 +72,9 @@ private:
   // ROS services
   ros::Publisher state_pub_;
   ros::Publisher servo_sensor_pub_;
+  ros::Publisher imu_pub_;
+  // ros::Publisher imu_std_pub_;
+
   ros::Subscriber duty_cycle_sub_;
   ros::Subscriber current_sub_;
   ros::Subscriber brake_sub_;
@@ -87,13 +88,12 @@ private:
   {
     MODE_INITIALIZING,
     MODE_OPERATING
-  }
-  driver_mode_t;
+  } driver_mode_t;
 
   // other variables
-  driver_mode_t driver_mode_;           ///< driver state machine mode (state)
-  int fw_version_major_;                ///< firmware major version reported by vesc
-  int fw_version_minor_;                ///< firmware minor version reported by vesc
+  driver_mode_t driver_mode_;  ///< driver state machine mode (state)
+  int fw_version_major_;       ///< firmware major version reported by vesc
+  int fw_version_minor_;       ///< firmware minor version reported by vesc
 
   // ROS callbacks
   void timerCallback(const ros::TimerEvent& event);

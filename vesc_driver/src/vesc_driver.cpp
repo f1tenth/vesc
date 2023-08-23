@@ -29,26 +29,27 @@
 
 #include <cassert>
 #include <cmath>
-#include <memory>
 #include <sstream>
-#include <string>
 
+#include <boost/bind.hpp>
 #include <vesc_msgs/VescStateStamped.h>
+#include <vesc_msgs/VescImuStamped.h>
 
 namespace vesc_driver
 {
 
-using std::placeholders::_1;
-
-VescDriver::VescDriver(ros::NodeHandle nh,
-                       ros::NodeHandle private_nh) :
-  vesc_(std::string(),
-        std::bind(&VescDriver::vescPacketCallback, this, _1),
-        std::bind(&VescDriver::vescErrorCallback, this, _1)),
-  duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0), current_limit_(private_nh, "current"),
-  brake_limit_(private_nh, "brake"), speed_limit_(private_nh, "speed"),
-  position_limit_(private_nh, "position"), servo_limit_(private_nh, "servo", 0.0, 1.0),
-  driver_mode_(MODE_INITIALIZING), fw_version_major_(-1), fw_version_minor_(-1)
+VescDriver::VescDriver(ros::NodeHandle nh, ros::NodeHandle private_nh)
+  : vesc_(std::string(), boost::bind(&VescDriver::vescPacketCallback, this, _1),
+          boost::bind(&VescDriver::vescErrorCallback, this, _1))
+  , duty_cycle_limit_(private_nh, "duty_cycle", -1.0, 1.0)
+  , current_limit_(private_nh, "current")
+  , brake_limit_(private_nh, "brake")
+  , speed_limit_(private_nh, "speed")
+  , position_limit_(private_nh, "position")
+  , servo_limit_(private_nh, "servo", 0.0, 1.0)
+  , driver_mode_(MODE_INITIALIZING)
+  , fw_version_major_(-1)
+  , fw_version_minor_(-1)
 {
   // get vesc serial port address
   std::string port;
@@ -73,14 +74,14 @@ VescDriver::VescDriver(ros::NodeHandle nh,
 
   // create vesc state (telemetry) publisher
   state_pub_ = nh.advertise<vesc_msgs::VescStateStamped>("sensors/core", 10);
+  imu_pub_ = nh.advertise<vesc_msgs::VescImuStamped>("sensors/imu", 10);
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
   servo_sensor_pub_ = nh.advertise<std_msgs::Float64>("sensors/servo_position_command", 10);
 
   // subscribe to motor and servo command topics
-  duty_cycle_sub_ = nh.subscribe("commands/motor/duty_cycle", 10,
-                                 &VescDriver::dutyCycleCallback, this);
+  duty_cycle_sub_ = nh.subscribe("commands/motor/duty_cycle", 10, &VescDriver::dutyCycleCallback, this);
   current_sub_ = nh.subscribe("commands/motor/current", 10, &VescDriver::currentCallback, this);
   brake_sub_ = nh.subscribe("commands/motor/brake", 10, &VescDriver::brakeCallback, this);
   speed_sub_ = nh.subscribe("commands/motor/speed", 10, &VescDriver::speedCallback, this);
@@ -122,19 +123,22 @@ void VescDriver::timerCallback(const ros::TimerEvent& event)
    */
   if (driver_mode_ == MODE_INITIALIZING)
   {
+    // ROS_INFO_STREAM("driver_mode = MODE_INITIALIZING");
     // request version number, return packet will update the internal version numbers
     vesc_.requestFWVersion();
     if (fw_version_major_ >= 0 && fw_version_minor_ >= 0)
     {
-      ROS_INFO("Connected to VESC with firmware version %d.%d",
-               fw_version_major_, fw_version_minor_);
+      ROS_INFO("Connected to VESC with firmware version %d.%d", fw_version_major_, fw_version_minor_);
       driver_mode_ = MODE_OPERATING;
     }
   }
   else if (driver_mode_ == MODE_OPERATING)
   {
+    // ROS_INFO_STREAM("driver_mode = MODE_OPERATING");
     // poll for vesc state (telemetry)
     vesc_.requestState();
+    // poll for vesc imu
+    vesc_.requestImuData();
   }
   else
   {
@@ -143,12 +147,13 @@ void VescDriver::timerCallback(const ros::TimerEvent& event)
   }
 }
 
-void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& packet)
+void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const>& packet)
 {
+  // ROS_INFO_STREAM(packet->name());
+
   if (packet->name() == "Values")
   {
-    std::shared_ptr<VescPacketValues const> values =
-      std::dynamic_pointer_cast<VescPacketValues const>(packet);
+    boost::shared_ptr<VescPacketValues const> values = boost::dynamic_pointer_cast<VescPacketValues const>(packet);
 
     vesc_msgs::VescStateStamped::Ptr state_msg(new vesc_msgs::VescStateStamped);
     state_msg->header.stamp = ros::Time::now();
@@ -170,11 +175,44 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& pac
   }
   else if (packet->name() == "FWVersion")
   {
-    std::shared_ptr<VescPacketFWVersion const> fw_version =
-      std::dynamic_pointer_cast<VescPacketFWVersion const>(packet);
+    boost::shared_ptr<VescPacketFWVersion const> fw_version =
+        boost::dynamic_pointer_cast<VescPacketFWVersion const>(packet);
     // todo: might need lock here
     fw_version_major_ = fw_version->fwMajor();
     fw_version_minor_ = fw_version->fwMinor();
+  }
+  else if (packet->name() == "ImuData")
+  {
+    boost::shared_ptr<VescPacketImu const> imuData = boost::dynamic_pointer_cast<VescPacketImu const>(packet);
+
+    auto imu_msg = new vesc_msgs::VescImuStamped();
+    // auto std_imu_msg = Imu();
+
+    imu_msg->header.stamp = ros::Time::now();
+    // std_imu_msg.header.stamp = ros::Time::now();
+
+    imu_msg->imu.ypr.x = imuData->roll();
+    imu_msg->imu.ypr.y = imuData->pitch();
+    imu_msg->imu.ypr.z = imuData->yaw();
+
+    imu_msg->imu.linear_acceleration.x = imuData->acc_x();
+    imu_msg->imu.linear_acceleration.y = imuData->acc_y();
+    imu_msg->imu.linear_acceleration.z = imuData->acc_z();
+
+    imu_msg->imu.angular_velocity.x = imuData->gyr_x();
+    imu_msg->imu.angular_velocity.y = imuData->gyr_y();
+    imu_msg->imu.angular_velocity.z = imuData->gyr_z();
+
+    imu_msg->imu.compass.x = imuData->mag_x();
+    imu_msg->imu.compass.y = imuData->mag_y();
+    imu_msg->imu.compass.z = imuData->mag_z();
+
+    imu_msg->imu.orientation.w = imuData->q_w();
+    imu_msg->imu.orientation.x = imuData->q_x();
+    imu_msg->imu.orientation.y = imuData->q_y();
+    imu_msg->imu.orientation.z = imuData->q_z();
+
+    imu_pub_.publish(*imu_msg);
   }
 }
 
@@ -190,7 +228,7 @@ void VescDriver::vescErrorCallback(const std::string& error)
  */
 void VescDriver::dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     vesc_.setDutyCycle(duty_cycle_limit_.clip(duty_cycle->data));
   }
@@ -203,7 +241,7 @@ void VescDriver::dutyCycleCallback(const std_msgs::Float64::ConstPtr& duty_cycle
  */
 void VescDriver::currentCallback(const std_msgs::Float64::ConstPtr& current)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     vesc_.setCurrent(current_limit_.clip(current->data));
   }
@@ -216,7 +254,7 @@ void VescDriver::currentCallback(const std_msgs::Float64::ConstPtr& current)
  */
 void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     vesc_.setBrake(brake_limit_.clip(brake->data));
   }
@@ -230,7 +268,7 @@ void VescDriver::brakeCallback(const std_msgs::Float64::ConstPtr& brake)
  */
 void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     vesc_.setSpeed(speed_limit_.clip(speed->data));
   }
@@ -242,7 +280,7 @@ void VescDriver::speedCallback(const std_msgs::Float64::ConstPtr& speed)
  */
 void VescDriver::positionCallback(const std_msgs::Float64::ConstPtr& position)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     // ROS uses radians but VESC seems to use degrees. Convert to degrees.
     double position_deg = position_limit_.clip(position->data) * 180.0 / M_PI;
@@ -255,7 +293,7 @@ void VescDriver::positionCallback(const std_msgs::Float64::ConstPtr& position)
  */
 void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
 {
-  if (driver_mode_ == MODE_OPERATING)
+  if (driver_mode_ = MODE_OPERATING)
   {
     double servo_clipped(servo_limit_.clip(servo->data));
     vesc_.setServo(servo_clipped);
@@ -268,8 +306,8 @@ void VescDriver::servoCallback(const std_msgs::Float64::ConstPtr& servo)
 
 VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::string& str,
                                        const boost::optional<double>& min_lower,
-                                       const boost::optional<double>& max_upper) :
-  name(str)
+                                       const boost::optional<double>& max_upper)
+  : name(str)
 {
   // check if user's minimum value is outside of the range min_lower to max_upper
   double param_min;
@@ -278,14 +316,14 @@ VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::str
     if (min_lower && param_min < *min_lower)
     {
       lower = *min_lower;
-      ROS_WARN_STREAM("Parameter " << name << "_min (" << param_min <<
-                      ") is less than the feasible minimum (" << *min_lower << ").");
+      ROS_WARN_STREAM("Parameter " << name << "_min (" << param_min << ") is less than the feasible minimum ("
+                                   << *min_lower << ").");
     }
     else if (max_upper && param_min > *max_upper)
     {
       lower = *max_upper;
-      ROS_WARN_STREAM("Parameter " << name << "_min (" << param_min <<
-                      ") is greater than the feasible maximum (" << *max_upper << ").");
+      ROS_WARN_STREAM("Parameter " << name << "_min (" << param_min << ") is greater than the feasible maximum ("
+                                   << *max_upper << ").");
     }
     else
     {
@@ -304,14 +342,14 @@ VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::str
     if (min_lower && param_max < *min_lower)
     {
       upper = *min_lower;
-      ROS_WARN_STREAM("Parameter " << name << "_max (" << param_max <<
-                      ") is less than the feasible minimum (" << *min_lower << ").");
+      ROS_WARN_STREAM("Parameter " << name << "_max (" << param_max << ") is less than the feasible minimum ("
+                                   << *min_lower << ").");
     }
     else if (max_upper && param_max > *max_upper)
     {
       upper = *max_upper;
-      ROS_WARN_STREAM("Parameter " << name << "_max (" << param_max <<
-                      ") is greater than the feasible maximum (" << *max_upper << ").");
+      ROS_WARN_STREAM("Parameter " << name << "_max (" << param_max << ") is greater than the feasible maximum ("
+                                   << *max_upper << ").");
     }
     else
     {
@@ -326,8 +364,8 @@ VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::str
   // check for min > max
   if (upper && lower && *lower > *upper)
   {
-    ROS_WARN_STREAM("Parameter " << name << "_max (" << *upper
-                    << ") is less than parameter " << name << "_min (" << *lower << ").");
+    ROS_WARN_STREAM("Parameter " << name << "_max (" << *upper << ") is less than parameter " << name << "_min ("
+                                 << *lower << ").");
     double temp(*lower);
     lower = *upper;
     upper = temp;
@@ -335,29 +373,30 @@ VescDriver::CommandLimit::CommandLimit(const ros::NodeHandle& nh, const std::str
 
   std::ostringstream oss;
   oss << "  " << name << " limit: ";
-  if (lower) oss << *lower << " ";
-  else oss << "(none) ";
-  if (upper) oss << *upper;
-  else oss << "(none)";
+  if (lower)
+    oss << *lower << " ";
+  else
+    oss << "(none) ";
+  if (upper)
+    oss << *upper;
+  else
+    oss << "(none)";
   ROS_DEBUG_STREAM(oss.str());
 }
 
 double VescDriver::CommandLimit::clip(double value)
-{
+{  // check
   if (lower && value < lower)
   {
-    ROS_INFO_THROTTLE(10, "%s command value (%f) below minimum limit (%f), clipping.",
-                      name.c_str(), value, *lower);
+    ROS_INFO_THROTTLE(10, "%s command value (%f) below minimum limit (%f), clipping.", name.c_str(), value, *lower);
     return *lower;
   }
   if (upper && value > upper)
   {
-    ROS_INFO_THROTTLE(10, "%s command value (%f) above maximum limit (%f), clipping.",
-                      name.c_str(), value, *upper);
+    ROS_INFO_THROTTLE(10, "%s command value (%f) above maximum limit (%f), clipping.", name.c_str(), value, *upper);
     return *upper;
   }
   return value;
 }
-
 
 }  // namespace vesc_driver

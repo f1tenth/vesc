@@ -28,14 +28,16 @@
 #ifndef VESC_DRIVER_VESC_PACKET_H_
 #define VESC_DRIVER_VESC_PACKET_H_
 
-#include <cstdint>
-#include <memory>
 #include <string>
 #include <vector>
 #include <utility>
 
-#define CRCPP_USE_CPP11
-#include "vesc_driver/crc.h"
+#include <boost/crc.hpp>
+#include <boost/shared_ptr.hpp>
+
+// #include "vesc_driver/crc.hpp"
+
+#include "vesc_driver/v8stdint.h"
 
 namespace vesc_driver
 {
@@ -48,7 +50,9 @@ typedef std::pair<Buffer::const_iterator, Buffer::const_iterator> BufferRangeCon
 class VescFrame
 {
 public:
-  virtual ~VescFrame() {}
+  virtual ~VescFrame()
+  {
+  }
 
   // getters
   virtual const Buffer& frame() const
@@ -57,21 +61,21 @@ public:
   }
 
   // VESC packet properties
-  static const int VESC_MAX_PAYLOAD_SIZE = 1024;           ///< Maximum VESC payload size, in bytes
-  static const int VESC_MIN_FRAME_SIZE = 5;                ///< Smallest VESC frame size, in bytes
+  static const int VESC_MAX_PAYLOAD_SIZE = 1024;                     ///< Maximum VESC payload size, in bytes
+  static const int VESC_MIN_FRAME_SIZE = 5;                          ///< Smallest VESC frame size, in bytes
   static const int VESC_MAX_FRAME_SIZE = 6 + VESC_MAX_PAYLOAD_SIZE;  ///< Largest VESC frame size, in bytes
-  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2;  ///< VESC start of "small" frame value
-  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3;  ///< VESC start of "large" frame value
-  static const unsigned int VESC_EOF_VAL = 3;              ///< VESC end-of-frame value
+  static const unsigned int VESC_SOF_VAL_SMALL_FRAME = 2;            ///< VESC start of "small" frame value
+  static const unsigned int VESC_SOF_VAL_LARGE_FRAME = 3;            ///< VESC start of "large" frame value
+  static const unsigned int VESC_EOF_VAL = 3;                        ///< VESC end-of-frame value
 
   /** CRC parameters for the VESC */
-  static constexpr CRC::Parameters<crcpp_uint16, 16> CRC_TYPE = { 0x1021, 0x0000, 0x0000, false, false };
+  typedef boost::crc_optimal<16, 0x1021, 0, 0, false, false> CRC;
 
 protected:
   /** Construct frame with specified payload size. */
-  explicit VescFrame(int payload_size);
+  VescFrame(int payload_size);
 
-  std::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
+  boost::shared_ptr<Buffer> frame_;  ///< Stores frame data, shared_ptr for shallow copy
   BufferRange payload_;              ///< View into frame's payload section
 
 private:
@@ -88,7 +92,9 @@ private:
 class VescPacket : public VescFrame
 {
 public:
-  virtual ~VescPacket() {}
+  virtual ~VescPacket()
+  {
+  }
 
   virtual const std::string& name() const
   {
@@ -97,21 +103,21 @@ public:
 
 protected:
   VescPacket(const std::string& name, int payload_size, int payload_id);
-  VescPacket(const std::string& name, std::shared_ptr<VescFrame> raw);
+  VescPacket(const std::string& name, boost::shared_ptr<VescFrame> raw);
 
 private:
   std::string name_;
 };
 
-typedef std::shared_ptr<VescPacket> VescPacketPtr;
-typedef std::shared_ptr<VescPacket const> VescPacketConstPtr;
+typedef boost::shared_ptr<VescPacket> VescPacketPtr;
+typedef boost::shared_ptr<VescPacket const> VescPacketConstPtr;
 
 /*------------------------------------------------------------------------------------------------*/
 
 class VescPacketFWVersion : public VescPacket
 {
 public:
-  explicit VescPacketFWVersion(std::shared_ptr<VescFrame> raw);
+  VescPacketFWVersion(boost::shared_ptr<VescFrame> raw);
 
   int fwMajor() const;
   int fwMinor() const;
@@ -128,7 +134,7 @@ public:
 class VescPacketValues : public VescPacket
 {
 public:
-  explicit VescPacketValues(std::shared_ptr<VescFrame> raw);
+  VescPacketValues(boost::shared_ptr<VescFrame> raw);
 
   double v_in() const;
   double temp_mos1() const;
@@ -162,7 +168,7 @@ public:
 class VescPacketSetDuty : public VescPacket
 {
 public:
-  explicit VescPacketSetDuty(double duty);
+  VescPacketSetDuty(double duty);
 
   //  double duty() const;
 };
@@ -172,7 +178,7 @@ public:
 class VescPacketSetCurrent : public VescPacket
 {
 public:
-  explicit VescPacketSetCurrent(double current);
+  VescPacketSetCurrent(double current);
 
   //  double current() const;
 };
@@ -182,7 +188,7 @@ public:
 class VescPacketSetCurrentBrake : public VescPacket
 {
 public:
-  explicit VescPacketSetCurrentBrake(double current_brake);
+  VescPacketSetCurrentBrake(double current_brake);
 
   //  double current_brake() const;
 };
@@ -192,7 +198,7 @@ public:
 class VescPacketSetRPM : public VescPacket
 {
 public:
-  explicit VescPacketSetRPM(double rpm);
+  VescPacketSetRPM(double rpm);
 
   //  double rpm() const;
 };
@@ -202,7 +208,7 @@ public:
 class VescPacketSetPos : public VescPacket
 {
 public:
-  explicit VescPacketSetPos(double pos);
+  VescPacketSetPos(double pos);
 
   //  double pos() const;
 };
@@ -212,10 +218,73 @@ public:
 class VescPacketSetServoPos : public VescPacket
 {
 public:
-  explicit VescPacketSetServoPos(double servo_pos);
+  VescPacketSetServoPos(double servo_pos);
 
   //  double servo_pos() const;
 };
+
+/*------------------------------------------------------------------------------------------------*/
+class VescPacketRequestImu : public VescPacket
+{
+public:
+  VescPacketRequestImu();
+};
+
+class VescPacketImu : public VescPacket
+{
+public:
+  explicit VescPacketImu(boost::shared_ptr<VescFrame> raw);
+
+  int mask() const;
+
+  double yaw() const;
+  double pitch() const;
+  double roll() const;
+
+  double acc_x() const;
+  double acc_y() const;
+  double acc_z() const;
+
+  double gyr_x() const;
+  double gyr_y() const;
+  double gyr_z() const;
+
+  double mag_x() const;
+  double mag_y() const;
+  double mag_z() const;
+
+  double q_w() const;
+  double q_x() const;
+  double q_y() const;
+  double q_z() const;
+
+private:
+  double getFloat32Auto(uint32_t* pos) const;
+
+  uint32_t mask_;
+  double roll_;
+  double pitch_;
+  double yaw_;
+
+  double acc_x_;
+  double acc_y_;
+  double acc_z_;
+
+  double gyr_x_;
+  double gyr_y_;
+  double gyr_z_;
+
+  double mag_x_;
+  double mag_y_;
+  double mag_z_;
+
+  double q0_;
+  double q1_;
+  double q2_;
+  double q3_;
+};
+
+/*------------------------------------------------------------------------------------------------*/
 
 }  // namespace vesc_driver
 

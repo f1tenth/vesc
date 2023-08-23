@@ -20,15 +20,17 @@ find_package(catkin REQUIRED COMPONENTS
   serial
   std_msgs
   vesc_msgs
+  serial
 )
 
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS
-    nodelet
-    pluginlib
-    std_msgs
-    vesc_msgs serial
+  nodelet
+  pluginlib
+  std_msgs
+  vesc_msgs serial
+  CATKIN_DEPENDS nodelet pluginlib roscpp std_msgs vesc_msgs serial
 )
 
 ###########

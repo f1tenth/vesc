@@ -5,7 +5,7 @@
 
   <!-- Optionally launch in GDB, for debugging -->
   <arg name="debug" default="false" />
-  <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb --args" />
+  <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb args" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
   <!-- VESC driver parameters -->
