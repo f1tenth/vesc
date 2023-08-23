@@ -4,30 +4,17 @@
   <arg name="node_name" default="vesc_driver_node" />
 
   <!-- Optionally launch in GDB, for debugging -->
-  <!-- <arg name="debug" default="false" /> -->
-  <!-- <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb args" /> -->
-  <!-- <arg unless="$(arg debug)" name="launch_prefix" value="" /> -->
+  <arg name="debug" default="false" />
+  <arg if="$(arg debug)" name="launch_prefix" value="xterm -e gdb args" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
 
   <!-- VESC driver parameters -->
-  <!-- <arg name="port" default="/dev/ttyUSB0" /> -->
+  <arg name="port" default="/dev/ttyUSB0" />
 
   <!-- VESC driver node -->
-  <!-- <node pkg="vesc_driver" type="vesc_driver_node" name="$(arg node_name)"
+  <node pkg="vesc_driver" type="vesc_driver_node" name="$(arg node_name)"
         output="screen" launch-prefix="$(arg launch_prefix)" >
     <param name="port" value="$(arg port)" />
-  </node> -->
-
-  <!-- Madgwick IMU Filter nodes -->
- <node pkg="nodelet" type="nodelet" name="imu_manager"
-    args="manager" output="screen" />
-
-  <node pkg="nodelet" type="nodelet" name="ImuFilterNodelet"
-    args="load imu_filter_madgwick/ImuFilterNodelet imu_manager"
-    output="screen">
-    <!-- <remap from="imu/data_raw" to="/sensors/imu"/> -->
-    <!-- <remap from="imu/data" to="imu/filtered/data"/> -->
-    <param name="publish_tf" value="false"/>
-
   </node>
 
 </launch>
