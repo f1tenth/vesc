@@ -23,12 +23,12 @@
   <build_depend>vesc_msgs</build_depend>
   <build_depend>serial</build_depend>
 
-  <exec_depend>nodelet</exec_depend>
-  <exec_depend>pluginlib</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>vesc_msgs</exec_depend>
-  <exec_depend>serial</exec_depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>vesc_msgs</depend>
+  <depend>serial</depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_driver_nodelet.xml"/>

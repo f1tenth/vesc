@@ -20,8 +20,8 @@
   <build_depend>message_generation</build_depend>
   <build_depend>geometry_msgs</build_depend>
 
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
+  <depend>std_msgs</depend>
+  <depend>message_runtime</depend>
+  <depend>geometry_msgs</depend>
 
 </package>

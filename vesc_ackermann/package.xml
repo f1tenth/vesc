@@ -27,15 +27,15 @@
   <build_depend>ackermann_msgs</build_depend>
   <build_depend>vesc_msgs</build_depend>
 
-  <exec_depend>nodelet</exec_depend>
-  <exec_depend>pluginlib</exec_depend>
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>nav_msgs</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>tf</exec_depend>
-  <exec_depend>ackermann_msgs</exec_depend>
-  <exec_depend>vesc_msgs</exec_depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>nav_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>tf</depend>
+  <depend>ackermann_msgs</depend>
+  <depend>vesc_msgs</depend>
 
   <export>
     <nodelet plugin="${prefix}/vesc_ackermann_nodelet.xml"/>

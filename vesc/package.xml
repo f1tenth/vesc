@@ -20,9 +20,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>vesc_driver</exec_depend>
-  <exec_depend>vesc_msgs</exec_depend>
-  <exec_depend>vesc_ackermann</exec_depend>
+  <depend>vesc_driver</depend>
+  <depend>vesc_msgs</depend>
+  <depend>vesc_ackermann</depend>
 
   <export>
     <metapackage/>
