@@ -126,20 +126,6 @@ VescPacketValues::VescPacketValues(boost::shared_ptr<VescFrame> raw) : VescPacke
 {
 }
 
-// double VescPacketValues::temp_mos1() const
-// {
-//   int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 1)) << 8) +
-//                                    static_cast<uint16_t>(*(payload_.first + 2)));
-//   return static_cast<double>(v) / 10.0;
-// }
-
-// double VescPacketValues::temp_mos2() const
-// {
-//   int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 3)) << 8) +
-//                                    static_cast<uint16_t>(*(payload_.first + 4)));
-//   return static_cast<double>(v) / 10.0;
-// }
-
 double VescPacketValues::temp_mos1() const
 {
   int16_t v = static_cast<int16_t>((static_cast<uint16_t>(*(payload_.first + 59)) << 8) +
@@ -375,38 +361,6 @@ VescPacketSetServoPos::VescPacketSetServoPos(double servo_pos) : VescPacket("Set
   *(frame_->end() - 3) = static_cast<uint8_t>(crc >> 8);
   *(frame_->end() - 2) = static_cast<uint8_t>(crc & 0xFF);
 }
-
-// VescPacketImu::VescPacketImu(boost::shared_ptr<VescFrame> raw)
-// : VescPacket("ImuData", raw) //check
-// {
-//   uint32_t ind = 1;
-//   mask_ = static_cast<uint32_t>(
-//     (static_cast<uint16_t>(*(payload_.first + ind       )) << 8) +
-//     static_cast<uint16_t>(*(payload_.first + ind + 1   ))
-//   );
-//   ind += 2;
-
-//   if (mask_ & ((uint32_t)1 << 0)) {roll_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 1)) {pitch_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 2)) {yaw_ = getFloat32Auto(&ind);}
-
-//   if (mask_ & ((uint32_t)1 << 3)) {acc_x_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 4)) {acc_y_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 5)) {acc_z_ = getFloat32Auto(&ind);}
-
-//   if (mask_ & ((uint32_t)1 << 6)) {gyr_x_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 7)) {gyr_y_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 8)) {gyr_z_ = getFloat32Auto(&ind);}
-
-//   if (mask_ & ((uint32_t)1 << 9)) {mag_x_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 10)) {mag_y_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 11)) {mag_z_ = getFloat32Auto(&ind);}
-
-//   if (mask_ & ((uint32_t)1 << 12)) {q0_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 13)) {q1_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 14)) {q2_ = getFloat32Auto(&ind);}
-//   if (mask_ & ((uint32_t)1 << 15)) {q3_ = getFloat32Auto(&ind);}
-// }
 
 VescPacketImu::VescPacketImu(boost::shared_ptr<VescFrame> raw) : VescPacket("ImuData", raw)
 {
